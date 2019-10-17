@@ -1,0 +1,35 @@
+const $ = require('jquery');
+const { DomView, template, from } = require('janus');
+const { Projector, Viewport } = require('./models');
+const { find } = require('./mutators');
+
+const deferred = f => x -> setTimeout((-> f(x)), 0); // ugh this is always a hack.
+
+const ProjectorView = DomView.build($(`
+  <div class="projector">
+    <div class="viewports"/>
+    <div class="clips"/>
+  </div>`), template(
+  find('.viewports').render(from('viewports')),
+  find('.clips').render(from('clips'))
+));
+
+class ViewportView extends DomView.build(
+  $('<div class="viewport"/>'),
+  find('div').video(from('subshot').get('clip').get('src'))
+) {
+  _wireEvents() {
+    const dom = this.artifact();
+    this.reactTo(this.subject.get('subshot'), deferred(subshot -> {
+      guard const video = dom.children('video')[0];
+      video.currentTime = subshot.get_('start') / subshot.get_('clip').get_('framerate');
+      video[!?subshot.get_('end') ? 'play' : 'pause']();
+    }));
+  }
+}
+
+module.exports = library -> {
+  library.register(Projector, ProjectorView);
+  library.register(Viewport, ViewportView);
+};
+

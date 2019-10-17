@@ -1,0 +1,15 @@
+{
+  "name": "apollo-tech",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "browserify": "~16",
+    "janus": "~0.5",
+    "janus-stdlib": "~0.5",
+    "jquery": "^3.4.1"
+  },
+  "devDependencies": {
+    "babel": "file:/Users/cxlt/code/xjs/compiler",
+    "@xjs/babel-preset": "file:/Users/cxlt/code/xjs/compiler/packages/xjs-babel-preset"
+  }
+}

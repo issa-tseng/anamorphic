@@ -1,0 +1,12 @@
+
+const { Varying } = require('janus');
+const $ = require('jquery');
+const { find } = require('./mutators');
+const preload = src -> {
+  const v = Varying.of(src);
+  find('div').video({ all: { point() { return v; } } })($('<div/>'))($('<div/>'));
+  v.set(null);
+};
+
+module.exports = { preload };
+

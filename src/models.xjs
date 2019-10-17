@@ -1,0 +1,60 @@
+const { Map, Model, attribute, initial, bind, from, List } = require('janus');
+
+
+////////////////////////////////////////////////////////////////////////////////
+// MODELS
+
+class Clip extends Model;
+class Clips extends List.of(Clip);
+
+class Subshot extends Model;
+class Shot extends List.of(Subshot);
+class Shots extends List.of(Shot);
+
+class Film extends Model.build(
+  attribute('shots', attribute.List.of(Shots)),
+  attribute('clips', class extends attribute.Model {
+    static deserialize(clips) {
+      for (const k of Object.keys(clips)) clips[k] = new Map(clips[k]);
+      return new Map(clips);
+    }
+  })
+);
+
+
+////////////////////////////////////////////////////////////////////////////////
+// VIEWMODELS
+
+class Projector extends Model.build(
+  initial('time', 0),
+  bind('shot', from('film').get('shots').and('time').all.flatMap((shots, time) => shots.get(time))),
+  bind('viewports', from.self().map(projector =>
+    new List((new Array(4)).fill(null).map(|_, idx => new Viewport({ projector, idx })))
+  ))
+) {
+  nextSlidePlease() { this.set('time', this.get_('time') + 1); }
+};
+
+class Viewport extends Model.build(
+  bind('film', from('projector').get('film')),
+  // we build this in two parts; the first to identify the subshot and then
+  // to augment it.
+  bind('_subshot', from('projector').get('shot').and('idx').all.flatMap(|shot, idx => shot?.get(idx))),
+  bind('subshot', from('film').get('clips').and('_subshot').get('clip').and('_subshot')
+    .all.flatMap(|clips, clip, subshot => {
+      guard clip; guard subshot;
+      return clips.get(clip).map(clip => subshot.with({ clip }));
+    }))
+);
+
+class App extends Model.build;
+
+
+module.exports = {
+  Clip, Clips,
+  Subshot, Shot, Shots,
+  Film,
+  Projector, Viewport,
+  App
+};
+

@@ -1,0 +1,29 @@
+const $ = require('jquery');
+const { App, Library } = require('janus');
+const { Film, Projector } = require('./models');
+const { preload } = require('./util');
+
+const views = new Library();
+require('./views')(views);
+require('janus-stdlib').view($).registerWith(views);
+
+window.tap = x -> { console.log(x); return x; };
+
+(async () => {
+  const request = await fetch(window.location.hash.slice(1));
+  const film = Film.deserialize(await request.json());
+  const projector = new Projector({ film });
+
+  for (const k of film.get_('clips').keys_())
+    preload(film.get_('clips').get_(k).get_('src'));
+
+  $(document).one('click', () => {
+    const app = new App({ views, projector, film });
+    const view = app.view(projector);
+    $('#anamorphic').append(view.artifact());
+    view.wireEvents();
+
+    $(document).on('click', ::projector.nextSlidePlease);
+  });
+})();
+
