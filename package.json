@@ -1,6 +1,6 @@
 {
-  "name": "apollo-tech",
-  "version": "0.1.0",
+  "name": "anamorphic",
+  "version": "1138",
   "private": true,
   "dependencies": {
     "browserify": "~16",
