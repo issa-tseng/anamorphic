@@ -23,7 +23,7 @@ const mutator = {};
   mutator.video = data => |dom, point, immediate = true => 
     data.all.point(point).react(immediate, x -> {
       dom.children().trigger('detach');
-      if (!?x) dom.append(acquire(x));
+      if (?x) dom.append(acquire(x));
     });
 }
 

@@ -1,5 +1,6 @@
-const $ = require('jquery');
+const { abs } = Math;
 const { DomView, template, from } = require('janus');
+const $ = require('jquery');
 const { Projector, Viewport } = require('./models');
 const { find } = require('./mutators');
 
@@ -10,7 +11,9 @@ const ProjectorView = DomView.build($(`
     <div class="viewports"/>
     <div class="clips"/>
   </div>`), template(
-  find('.viewports').render(from('viewports')),
+  find('.viewports')
+    .render(from('viewports'))
+    .classGroup('active-', from('shot').flatMap(.length)),
   find('.clips').render(from('clips'))
 ));
 
@@ -22,8 +25,31 @@ class ViewportView extends DomView.build(
     const dom = this.artifact();
     this.reactTo(this.subject.get('subshot'), deferred(subshot -> {
       guard const video = dom.children('video')[0];
-      video.currentTime = subshot.get_('start') / subshot.get_('clip').get_('framerate');
-      video[!?subshot.get_('end') ? 'play' : 'pause']();
+      const start = subshot.get_('start');
+      const framerate = subshot.get_('clip').get_('framerate');
+
+      video.currentTime = start / framerate;
+      video.volume = (subshot.get_('mute') === true) ? 0 : 1;
+
+      const end = subshot.get_('end') {
+        const target = end / framerate;
+        const oneFrame = 1 / framerate;
+        const threshold = (end - start) / framerate * 1000 - oneFrame;
+        const check = -> {
+          if (abs(video.currentTime - target) >= oneFrame)
+            return requestAnimationFrame(check);
+
+          if (subshot.get_('loop') !== true) {
+            video.pause();
+            video.currentTime = target;
+          } else {
+            video.currentTime = start / framerate;
+            setTimeout(check, threshold);
+          }
+        };
+        setTimeout(check, threshold);
+      };
+      video[?end ? 'play' : 'pause']();
     }));
   }
 }
