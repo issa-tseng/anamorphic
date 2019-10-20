@@ -62,6 +62,10 @@ const SlideView = DomView.build(
   find('a')
     .text(from('name'))
     .classed('major', from('major'))
+    .classed('active', from.self().flatMap(.closest(Projector)).map(.subject)
+      .and.subject()
+      .all.flatMap(|projector, slide => projector.get('slide').map(s => s === slide)))
+
     // TODO: is there some best of both worlds here?
     .on('click', |event, subject, view, dom -> {
       event.preventDefault();

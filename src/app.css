@@ -3,7 +3,7 @@ body { background-color: #000; color: #fff; }
 html, body, div { margin: 0; padding: 0; }
 
 .viewports {
-  box-shadow: 0 0 0 2px #000, 0 0 0 3px #888;
+  box-shadow: 0 0 0 2px #000, 0 0 0 3px #444;
   height: calc((100vw - 4em) * 0.5625);
   margin-left: 2em;
   margin-top: 2em;
@@ -27,12 +27,14 @@ html, body, div { margin: 0; padding: 0; }
 
 .slides { padding: 1em 2em; }
 .slides a {
+  border-left: 1px solid transparent;
   break-after: avoid-column;
   break-before: avoid-column;
   color: #f0f0f0;
   display: block;
   font-size: 1.2em;
   padding-bottom: 0.2em;
+  padding-left: 0.5em;
   text-decoration: none;
 }
 .slides a:hover {
@@ -43,6 +45,7 @@ html, body, div { margin: 0; padding: 0; }
   color: #fff;
   font-weight: bold;
 }
+.slides a.active { border-left-color: #aaa; }
 
 .init {
   color: #777;
