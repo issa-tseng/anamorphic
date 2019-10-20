@@ -20,7 +20,7 @@ window.tap = x -> { console.log(x); return x; };
   $(document).one('click', () => {
     const app = new App({ views, projector, film });
     const view = app.view(projector);
-    $('#anamorphic').append(view.artifact());
+    $('#anamorphic').empty().append(view.artifact());
     view.wireEvents();
 
     $(document).on('click', ::projector.nextSlidePlease);

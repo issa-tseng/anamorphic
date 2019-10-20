@@ -1,5 +1,5 @@
-html { font-size: 62.5%; }
-body { background-color: #000; }
+html { font-family: "Helvetica Neue Light"; font-size: 62.5%; }
+body { background-color: #000; color: #fff; }
 html, body, div { margin: 0; padding: 0; }
 
 .viewports {
@@ -23,5 +23,15 @@ html, body, div { margin: 0; padding: 0; }
   top: 50%;
   transform: translateY(-50%);
   width: 100%;
+}
+
+.init {
+  color: #777;
+  left: calc(50% - 5em);
+  letter-spacing: 0.07em;
+  position: absolute;
+  text-align: center;
+  top: 50%;
+  width: 10em;
 }
 
