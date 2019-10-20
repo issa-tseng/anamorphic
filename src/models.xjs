@@ -37,8 +37,10 @@ class Projector extends Model.build(
   bind('slide-shots', from('slide').get('shots')),
   bind('viewports', from.self().map(projector =>
     new List((new Array(4)).fill(null).map(|_, idx => new Viewport({ projector, idx })))
-  ))
+  )),
+  bind('major-slides', from('film').get('slides').flatMap(.filter(.get('major')).length))
 ) {
+  previous() { this.set('time', this.get_('time') - 1); }
   nextSlidePlease() { this.set('time', this.get_('time') + 1); }
 };
 

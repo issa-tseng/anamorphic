@@ -25,6 +25,25 @@ html, body, div { margin: 0; padding: 0; }
   width: 100%;
 }
 
+.slides { padding: 1em 2em; }
+.slides a {
+  break-after: avoid-column;
+  break-before: avoid-column;
+  color: #f0f0f0;
+  display: block;
+  font-size: 1.2em;
+  padding-bottom: 0.2em;
+  text-decoration: none;
+}
+.slides a:hover {
+  text-decoration: underline
+}
+.slides a.major {
+  break-before: column;
+  color: #fff;
+  font-weight: bold;
+}
+
 .init {
   color: #777;
   left: calc(50% - 5em);

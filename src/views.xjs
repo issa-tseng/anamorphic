@@ -1,7 +1,7 @@
 const { abs } = Math;
 const { DomView, template, from } = require('janus');
 const $ = require('jquery');
-const { Projector, Viewport } = require('./models');
+const { Projector, Viewport, Slide } = require('./models');
 const { find } = require('./mutators');
 
 const deferred = f => x -> setTimeout((-> f(x)), 0); // ugh this is always a hack.
@@ -16,6 +16,8 @@ const ProjectorView = DomView.build($(`
     .classGroup('active-', from('slide-shots').flatMap(.length)),
   find('.slides')
     .render(from('film').get('slides'))
+    .css('column-count', from('major-slides'))
+    .css('width', from('major-slides').map(x => `${x * 14}em`))
 ));
 
 class ViewportView extends DomView.build(
@@ -55,8 +57,22 @@ class ViewportView extends DomView.build(
   }
 }
 
+const SlideView = DomView.build(
+  $('<a href="#"/>'),
+  find('a')
+    .text(from('name'))
+    .classed('major', from('major'))
+    // TODO: is there some best of both worlds here?
+    .on('click', |event, subject, view, dom -> {
+      event.preventDefault();
+      view.closest_(Projector).subject.set('time', dom.prevAll().length);
+    })
+);
+
+
 module.exports = library -> {
   library.register(Projector, ProjectorView);
   library.register(Viewport, ViewportView);
+  library.register(Slide, SlideView);
 };
 
