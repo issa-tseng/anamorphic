@@ -9,29 +9,30 @@ const deferred = f => x -> setTimeout((-> f(x)), 0); // ugh this is always a hac
 const ProjectorView = DomView.build($(`
   <div class="projector">
     <div class="viewports"/>
-    <div class="clips"/>
+    <div class="slides"/>
   </div>`), template(
   find('.viewports')
     .render(from('viewports'))
-    .classGroup('active-', from('shot').flatMap(.length)),
-  find('.clips').render(from('clips'))
+    .classGroup('active-', from('slide-shots').flatMap(.length)),
+  find('.slides')
+    .render(from('film').get('slides'))
 ));
 
 class ViewportView extends DomView.build(
   $('<div class="viewport"/>'),
-  find('div').video(from('subshot').get('clip').get('src'))
+  find('div').video(from('shot').get('clip').get('src'))
 ) {
   _wireEvents() {
     const dom = this.artifact();
-    this.reactTo(this.subject.get('subshot'), deferred(subshot -> {
+    this.reactTo(this.subject.get('shot'), deferred(shot -> {
       guard const video = dom.children('video')[0];
-      const start = subshot.get_('start');
-      const framerate = subshot.get_('clip').get_('framerate');
+      const start = shot.get_('start');
+      const framerate = shot.get_('clip').get_('framerate');
 
       video.currentTime = start / framerate;
-      video.volume = (subshot.get_('mute') === true) ? 0 : 1;
+      video.volume = (shot.get_('mute') === true) ? 0 : 1;
 
-      const end = subshot.get_('end') {
+      const end = shot.get_('end') {
         const target = end / framerate;
         const oneFrame = 1 / framerate;
         const threshold = (end - start) / framerate * 1000 - oneFrame;
@@ -39,7 +40,7 @@ class ViewportView extends DomView.build(
           if (abs(video.currentTime - target) >= oneFrame)
             return requestAnimationFrame(check);
 
-          if (subshot.get_('loop') !== true) {
+          if (shot.get_('loop') !== true) {
             video.pause();
             video.currentTime = target;
           } else {

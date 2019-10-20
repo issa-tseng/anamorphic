@@ -7,12 +7,15 @@ const { Map, Model, attribute, initial, bind, from, List } = require('janus');
 class Clip extends Model;
 class Clips extends List.of(Clip);
 
-class Subshot extends Model;
-class Shot extends List.of(Subshot);
+class Shot extends Model;
 class Shots extends List.of(Shot);
+class Slide extends Model.build(
+  attribute('shots', attribute.List.of(Shots))
+);
+class Slides extends List.of(Slide);
 
 class Film extends Model.build(
-  attribute('shots', attribute.List.of(Shots)),
+  attribute('slides', attribute.List.of(Slides)),
   attribute('clips', class extends attribute.Model {
     static deserialize(clips) {
       for (const k of Object.keys(clips)) clips[k] = new Map(clips[k]);
@@ -27,7 +30,11 @@ class Film extends Model.build(
 
 class Projector extends Model.build(
   initial('time', 0),
-  bind('shot', from('film').get('shots').and('time').all.flatMap((shots, time) => shots.get(time))),
+  bind('slide', from('film').get('slides').and('time').all.flatMap((slides, time) => slides.get(time))),
+  //synonym(
+  //  'time', (slide => slides.indexOf_(slide)),
+  //  'slide', (time => slides.get_(slide)))
+  bind('slide-shots', from('slide').get('shots')),
   bind('viewports', from.self().map(projector =>
     new List((new Array(4)).fill(null).map(|_, idx => new Viewport({ projector, idx })))
   ))
@@ -37,13 +44,13 @@ class Projector extends Model.build(
 
 class Viewport extends Model.build(
   bind('film', from('projector').get('film')),
-  // we build this in two parts; the first to identify the subshot and then
-  // to augment it.
-  bind('_subshot', from('projector').get('shot').and('idx').all.flatMap(|shot, idx => shot?.get(idx))),
-  bind('subshot', from('film').get('clips').and('_subshot').get('clip').and('_subshot')
-    .all.flatMap(|clips, clip, subshot => {
-      guard clip; guard subshot;
-      return clips.get(clip).map(clip => subshot.with({ clip }));
+  // we build this in two parts; the first to identify the shot
+  bind('_shot', from('projector').get('slide').and('idx').all.flatMap(|slide, idx => slide?.get('shots').flatMap(.get(idx)))),
+  // and the second to augment it.
+  bind('shot', from('film').get('clips').and('_shot').get('clip').and('_shot')
+    .all.flatMap(|clips, clip, shot => {
+      guard clip; guard shot;
+      return clips.get(clip).map(clip => shot.with({ clip }));
     }))
 );
 
@@ -52,7 +59,7 @@ class App extends Model.build;
 
 module.exports = {
   Clip, Clips,
-  Subshot, Shot, Shots,
+  Shot, Shots, Slide, Slides,
   Film,
   Projector, Viewport,
   App
