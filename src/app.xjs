@@ -1,3 +1,5 @@
+window.tap = x -> { console.log(x); return x; };
+
 const $ = require('jquery');
 const { App, Library } = require('janus');
 const { Film, Projector } = require('./models');
@@ -6,8 +8,6 @@ const { preload } = require('./util');
 const views = new Library();
 require('./views')(views);
 require('janus-stdlib').view($).registerWith(views);
-
-window.tap = x -> { console.log(x); return x; };
 
 (async () => {
   const request = await fetch(window.location.hash.slice(1));
