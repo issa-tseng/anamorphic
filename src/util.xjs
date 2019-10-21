@@ -1,12 +1,37 @@
-
 const { Varying } = require('janus');
 const $ = require('jquery');
 const { find } = require('./mutators');
+
 const preload = src -> {
   const v = Varying.of(src);
   find('div').video({ all: { point() { return v; } } })($('<div/>'))($('<div/>'));
   v.set(null);
 };
 
-module.exports = { preload };
+
+const fix = (f =>
+  (x => f(y => x(x)(y)))
+  (x => f(y => x(x)(y)))
+);
+
+const scheduler = => {
+  let timer;
+  return |video, start, end, framerate, cb => {
+    clearTimeout(timer);
+    const target = end / framerate;
+    const oneFrame = 1 / framerate;
+    const threshold = (end - start) / framerate * 1000 - oneFrame;
+
+    const check = -> {
+      if (curTimer !== timer) return;
+      const delta = target - video.currentTime;
+      if (delta > 0.1) curTimer = timer = setTimeout(check, (delta - 0.1) * 1000);
+      else if (delta >= oneFrame) requestAnimationFrame(check);
+      else cb();
+    };
+    let curTimer = timer = setTimeout(check, threshold);
+  };
+};
+
+module.exports = { preload, fix, scheduler };
 

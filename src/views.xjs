@@ -3,6 +3,7 @@ const { DomView, template, from } = require('janus');
 const $ = require('jquery');
 const { Projector, Viewport, Slide } = require('./models');
 const { find } = require('./mutators');
+const { fix, scheduler } = require('./util');
 
 const deferred = f => x -> setTimeout((-> f(x)), 0); // ugh this is always a hack.
 
@@ -26,6 +27,8 @@ class ViewportView extends DomView.build(
 ) {
   _wireEvents() {
     const dom = this.artifact();
+    const schedule = scheduler();
+
     this.reactTo(this.subject.get('shot'), deferred(shot -> {
       guard const video = dom.children('video')[0];
       const start = shot.get_('start');
@@ -35,22 +38,15 @@ class ViewportView extends DomView.build(
       video.volume = (shot.get_('mute') === true) ? 0 : 1;
 
       const end = shot.get_('end') {
-        const target = end / framerate;
-        const oneFrame = 1 / framerate;
-        const threshold = (end - start) / framerate * 1000 - oneFrame;
-        const check = -> {
-          if (abs(video.currentTime - target) >= oneFrame)
-            return requestAnimationFrame(check);
-
+        fix(set => => schedule(video, start, end, framerate, -> {
           if (shot.get_('loop') !== true) {
             video.pause();
-            video.currentTime = target;
+            video.currentTime = end / framerate;
           } else {
             video.currentTime = start / framerate;
-            setTimeout(check, threshold);
+            set();
           }
-        };
-        setTimeout(check, threshold);
+        }))();
       };
       video[?end ? 'play' : 'pause']();
     }));
