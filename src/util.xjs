@@ -17,13 +17,14 @@ const fix = (f =>
 const scheduler = => {
   let timer;
   return |video, start, end, framerate, cb => {
-    clearTimeout(timer);
+    timer = clearTimeout(timer);
+    guard video;
     const target = end / framerate;
     const oneFrame = 1 / framerate;
     const threshold = (end - start) / framerate * 1000 - oneFrame;
 
     const check = -> {
-      if (curTimer !== timer) return;
+      if (curTimer isnt timer) return;
       const delta = target - video.currentTime;
       if (delta > 0.1) curTimer = timer = setTimeout(check, (delta - 0.1) * 1000);
       else if (delta >= oneFrame) requestAnimationFrame(check);

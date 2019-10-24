@@ -1,38 +1,53 @@
 const { abs } = Math;
-const { DomView, template, from } = require('janus');
+const { DomView, template, from, Model, bind } = require('janus');
 const $ = require('jquery');
-const { Projector, Viewport, Slide } = require('./models');
+const { Projector, Shot, Slide } = require('./models');
 const { find } = require('./mutators');
 const { fix, scheduler } = require('./util');
 
-const deferred = f => x -> setTimeout((-> f(x)), 0); // ugh this is always a hack.
+const deferred = f => setTimeout(f, 0);
 
 const ProjectorView = DomView.build($(`
   <div class="projector">
-    <div class="viewports"/>
+    <div class="screen"/>
     <div class="slides"/>
   </div>`), template(
-  find('.viewports')
-    .render(from('viewports'))
-    .classGroup('active-', from('slide-shots').flatMap(.length)),
+  find('.screen').render(from('slide')).context('screen'),
   find('.slides')
-    .render(from('film').get('slides'))
+    .render(from.attribute('slide')).criteria({ context: 'edit', style: 'list' })
     .css('column-count', from('major-slides'))
     .css('width', from('major-slides').map(x => `${x * 14}em`))
 ));
 
-class ViewportView extends DomView.build(
-  $('<div class="viewport"/>'),
-  find('div').video(from('shot').get('clip').get('src'))
-) {
+const SlideMainView = DomView.build($(`
+  <div class="slide">
+    <div class="shots"/>
+  </div>`), template(
+  find('.shots')
+    .render(from('shots'))
+    .classGroup('count-', from('shots').flatMap(.length))
+));
+
+const ShotVM = Model.build(
+  bind('clip', from.app('film').get('clips')
+    .and.subject('clip').all.flatMap(|cs, k => cs.get(k)))
+);
+class ShotView extends DomView.build(ShotVM, $(`
+  <div class="shot">
+    <div class="video"/>
+  </div>`), template(
+  find('.video').video(from.vm('clip').flatMap(.get('src')))
+)) {
   _wireEvents() {
+    const shot = this.subject;
+    const shotvm = this.vm;
     const dom = this.artifact();
     const schedule = scheduler();
 
-    this.reactTo(this.subject.get('shot'), deferred(shot -> {
-      guard const video = dom.children('video')[0];
+    deferred(-> {
+      guard const video = dom.find('.video video')[0];
       const start = shot.get_('start');
-      const framerate = shot.get_('clip').get_('framerate');
+      const framerate = shotvm.get_('clip').get_('framerate');
 
       video.currentTime = start / framerate;
       video.volume = (shot.get_('mute') === true) ? 0 : 1;
@@ -49,7 +64,12 @@ class ViewportView extends DomView.build(
         }))();
       };
       video[?end ? 'play' : 'pause']();
-    }));
+    });
+
+    this.on('destroying', -> {
+      schedule();
+      dom.find('video').trigger('detach');
+    });
   }
 }
 
@@ -72,7 +92,8 @@ const SlideView = DomView.build(
 
 module.exports = library -> {
   library.register(Projector, ProjectorView);
-  library.register(Viewport, ViewportView);
+  library.register(Slide, SlideMainView, { context: 'screen' });
+  library.register(Shot, ShotView);
   library.register(Slide, SlideView);
 };
 

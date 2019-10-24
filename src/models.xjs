@@ -29,32 +29,22 @@ class Film extends Model.build(
 // VIEWMODELS
 
 class Projector extends Model.build(
-  initial('time', 0),
-  bind('slide', from('film').get('slides').and('time').all.flatMap((slides, time) => slides.get(time))),
-  //synonym(
-  //  'time', (slide => slides.indexOf_(slide)),
-  //  'slide', (time => slides.get_(slide)))
-  bind('slide-shots', from('slide').get('shots')),
-  bind('viewports', from.self().map(projector =>
-    new List((new Array(4)).fill(null).map(|_, idx => new Viewport({ projector, idx })))
-  )),
+  attribute('slide', class extends attribute.Enum {
+    initial() { return this.model.get_('film').get_('slides').get_(0); }
+    _values() { return from('film').get('slides'); }
+  }),
+  bind('time', from('film').get('slides').and('slide').all.flatMap(|ss, s => ss.indexOf(s))),
   bind('major-slides', from('film').get('slides').flatMap(.filter(.get('major')).length))
 ) {
-  previous() { this.set('time', this.get_('time') - 1); }
-  nextSlidePlease() { this.set('time', this.get_('time') + 1); }
+  _navigate(delta) {
+    const idx = this.get_('time') + delta;
+    guard const tgt = this.get_('film').get_('slides').get_(idx);
+    this.set('slide', tgt);
+  }
+  previous() { this._navigate(-1); }
+  nextSlidePlease() { this._navigate(+1); }
 };
 
-class Viewport extends Model.build(
-  bind('film', from('projector').get('film')),
-  // we build this in two parts; the first to identify the shot
-  bind('_shot', from('projector').get('slide').and('idx').all.flatMap(|slide, idx => slide?.get('shots').flatMap(.get(idx)))),
-  // and the second to augment it.
-  bind('shot', from('film').get('clips').and('_shot').get('clip').and('_shot')
-    .all.flatMap(|clips, clip, shot => {
-      guard clip; guard shot;
-      return clips.get(clip).map(clip => shot.with({ clip }));
-    }))
-);
 
 class App extends Model.build;
 
@@ -63,7 +53,6 @@ module.exports = {
   Clip, Clips,
   Shot, Shots, Slide, Slides,
   Film,
-  Projector, Viewport,
-  App
+  Projector, App
 };
 

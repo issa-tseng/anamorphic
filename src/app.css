@@ -2,7 +2,7 @@ html { font-family: "Helvetica Neue Light"; font-size: 62.5%; }
 body { background-color: #000; color: #fff; }
 html, body, div { margin: 0; padding: 0; }
 
-.viewports {
+.screen {
   box-shadow: 0 0 0 2px #000, 0 0 0 3px #444;
   height: calc((100vw - 4em) * 0.5625);
   margin-left: 2em;
@@ -11,14 +11,14 @@ html, body, div { margin: 0; padding: 0; }
   width: calc(100% - 4em);
 }
 
-.viewports.active-1 .viewport {
+.shots.count-1 .video {
   bottom: 0;
   left: 0;
   position: absolute;
   right: 0;
   top: 0;
 }
-.viewports.active-1 .viewport video {
+.shots.count-1 .video video {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
