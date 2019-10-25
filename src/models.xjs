@@ -1,4 +1,5 @@
 const { Map, Model, attribute, initial, bind, from, List } = require('janus');
+const BaseApp = require('janus').App;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -7,7 +8,11 @@ const { Map, Model, attribute, initial, bind, from, List } = require('janus');
 class Clip extends Model;
 class Clips extends List.of(Clip);
 
-class Shot extends Model;
+class Frame extends attribute.Number;
+class Shot extends Model.build(
+  attribute('start', Frame),
+  attribute('end', Frame)
+);
 class Shots extends List.of(Shot);
 class Slide extends Model.build(
   attribute('shots', attribute.List.of(Shots))
@@ -46,12 +51,14 @@ class Projector extends Model.build(
 };
 
 
-class App extends Model.build;
+class App extends BaseApp.build(
+  attribute('editing', attribute.Boolean)
+);
 
 
 module.exports = {
   Clip, Clips,
-  Shot, Shots, Slide, Slides,
+  Frame, Shot, Shots, Slide, Slides,
   Film,
   Projector, App
 };

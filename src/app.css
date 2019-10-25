@@ -2,6 +2,13 @@ html { font-family: "Helvetica Neue Light"; font-size: 62.5%; }
 body { background-color: #000; color: #fff; }
 html, body, div { margin: 0; padding: 0; }
 
+button {
+  color: #fff;
+  background: #000;
+  border: 1px solid #777;
+  font-family: courier;
+}
+
 .screen {
   box-shadow: 0 0 0 2px #000, 0 0 0 3px #444;
   height: calc((100vw - 4em) * 0.5625);
@@ -11,14 +18,14 @@ html, body, div { margin: 0; padding: 0; }
   width: calc(100% - 4em);
 }
 
-.shots.count-1 .video {
+.shots.count-1 .shot {
   bottom: 0;
   left: 0;
   position: absolute;
   right: 0;
   top: 0;
 }
-.shots.count-1 .video video {
+.shots.count-1 .shot video {
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -46,6 +53,34 @@ html, body, div { margin: 0; padding: 0; }
   font-weight: bold;
 }
 .slides a.active { border-left-color: #aaa; }
+
+.shot-editor {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.shot-editor .delimit { padding: 1em; position: absolute; }
+.shot-editor .end { right: 0; text-align: right; }
+.shot-editor .delimit.at button { border-color: #098ce5; }
+.shot-editor button {
+  margin: 0 0.1em 0.5em;
+  width: 3em;
+}
+
+.editing {
+  height: 8em;
+  left: calc(50% - 10em);
+  padding-top: 1em;
+  position: absolute;
+  text-align: center;
+  top: 2em;
+  width: 20em;
+}
+.editing button { display: none; }
+.is-editing .editing button { display: inline-block; }
+.editing:hover button { display: inline-block; }
 
 .init {
   color: #777;

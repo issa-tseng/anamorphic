@@ -1,8 +1,8 @@
 window.tap = x -> { console.log(x); return x; };
 
 const $ = require('jquery');
-const { App, Library } = require('janus');
-const { Film, Projector } = require('./models');
+const { Library } = require('janus');
+const { App, Film, Projector } = require('./models');
 const { preload } = require('./util');
 
 const views = new Library();

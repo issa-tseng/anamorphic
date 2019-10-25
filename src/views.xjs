@@ -1,7 +1,7 @@
 const { abs } = Math;
 const { DomView, template, from, Model, bind } = require('janus');
 const $ = require('jquery');
-const { Projector, Shot, Slide } = require('./models');
+const { Projector, Slide, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
 const { fix, scheduler } = require('./util');
 
@@ -11,12 +11,18 @@ const ProjectorView = DomView.build($(`
   <div class="projector">
     <div class="screen"/>
     <div class="slides"/>
+    <div class="editing"/>
   </div>`), template(
+  find('.projector').classed('is-editing', from.app('editing')),
   find('.screen').render(from('slide')).context('screen'),
   find('.slides')
     .render(from.attribute('slide')).criteria({ context: 'edit', style: 'list' })
     .css('column-count', from('major-slides'))
-    .css('width', from('major-slides').map(x => `${x * 14}em`))
+    .css('width', from('major-slides').map(x => `${x * 14}em`)),
+  find('.editing')
+    .render(from.app().attribute('editing'))
+      .criteria({ context: 'edit', style: 'button' })
+      .options({ stringify: (e => e ? 'editing' : 'edit') })
 ));
 
 const SlideMainView = DomView.build($(`
@@ -25,6 +31,7 @@ const SlideMainView = DomView.build($(`
   </div>`), template(
   find('.shots')
     .render(from('shots'))
+      .options(from.app('editing').map(e => ({ renderItem: .context(e ? 'edit' : null) })))
     .classGroup('count-', from('shots').flatMap(.length))
 ));
 
@@ -32,12 +39,9 @@ const ShotVM = Model.build(
   bind('clip', from.app('film').get('clips')
     .and.subject('clip').all.flatMap(|cs, k => cs.get(k)))
 );
-class ShotView extends DomView.build(ShotVM, $(`
-  <div class="shot">
-    <div class="video"/>
-  </div>`), template(
-  find('.video').video(from.vm('clip').flatMap(.get('src')))
-)) {
+class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
+  find('div').video(from.vm('clip').get('src'))
+) {
   _wireEvents() {
     const shot = this.subject;
     const shotvm = this.vm;
@@ -45,7 +49,7 @@ class ShotView extends DomView.build(ShotVM, $(`
     const schedule = scheduler();
 
     deferred(-> {
-      guard const video = dom.find('.video video')[0];
+      guard const video = dom.children('video')[0];
       const start = shot.get_('start');
       const framerate = shotvm.get_('clip').get_('framerate');
 
@@ -72,21 +76,63 @@ class ShotView extends DomView.build(ShotVM, $(`
     });
   }
 }
+class ShotEditor extends DomView.build(ShotVM, $(`
+  <div class="shot-editor">
+    <div class="shot"/>
+    <div class="delimit start">
+      <div class="editor"/>
+      <button class="go">&lt;&lt;</button>
+    </div>
+    <div class="delimit end">
+      <div class="editor"/>
+      <button class="go">&gt;&gt;</button>
+    </div>
+  </div>
+`), template(
+  find('.shot').video(from.vm('clip').get('src')),
+  find('.start').classed('at', from('start').and.vm('at').all.map(|x, y => x is y)),
+  find('.start .editor').render(from.attribute('start')),
+  find('.end').classed('at', from('end').and.vm('at').all.map(|x, y => x is y)),
+  find('.end .editor').render(from.attribute('end')),
+  find('.go').on('click', |event, shot, view ->
+    view.go(shot.get_(($(event.target).text() < '>') ? 'start' : 'end')))
+)) {
+  go(time) {
+    guard const video = this.artifact().find('.shot video')[0];
+    const framerate = this.vm.get_('clip').get_('framerate');
+    video.currentTime = time / framerate;
+    this.vm.set('at', time);
+  }
+  _wireEvents() {
+    deferred(-> {
+      const shot = this.subject;
+      this.reactTo(shot.get('start'), ::this.go);
+      this.reactTo(shot.get('end'), false, ::this.go);
+    });
+  }
+  _destroy() { this.artifact().find('video').trigger('detach'); }
+};
 
-const SlideView = DomView.build(
-  $('<a href="#"/>'),
+const FrameEditor = DomView.build($(`
+  <div class="frame-attribute">
+    <button>-10</button><button>-5</button><button>-1</button>
+    <button>1</button><button>5</button><button>-10</button>
+  </div>
+`), template(
+  find('div').on('click', 'button', |event, subject -> {
+    const delta = $(event.target).text() |> parseInt;
+    subject.setValue(subject.getValue_() + delta);
+  })
+));
+
+const SlideListView = DomView.build(
+  $('<a/>'),
   find('a')
     .text(from('name'))
     .classed('major', from('major'))
     .classed('active', from.self().flatMap(.closest(Projector)).map(.subject)
       .and.subject()
       .all.flatMap(|projector, slide => projector.get('slide').map(s => s === slide)))
-
-    // TODO: is there some best of both worlds here?
-    .on('click', |event, subject, view, dom -> {
-      event.preventDefault();
-      view.closest_(Projector).subject.set('time', dom.prevAll().length);
-    })
 );
 
 
@@ -94,6 +140,8 @@ module.exports = library -> {
   library.register(Projector, ProjectorView);
   library.register(Slide, SlideMainView, { context: 'screen' });
   library.register(Shot, ShotView);
-  library.register(Slide, SlideView);
+  library.register(Shot, ShotEditor, { context: 'edit' });
+  library.register(Frame, FrameEditor);
+  library.register(Slide, SlideListView);
 };
 
