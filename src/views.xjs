@@ -116,7 +116,7 @@ class ShotEditor extends DomView.build(ShotVM, $(`
 const FrameEditor = DomView.build($(`
   <div class="frame-attribute">
     <button>-10</button><button>-5</button><button>-1</button>
-    <button>1</button><button>5</button><button>-10</button>
+    <button>+1</button><button>+5</button><button>+10</button>
   </div>
 `), template(
   find('div').on('click', 'button', |event, subject -> {
