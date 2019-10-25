@@ -38,6 +38,7 @@ button {
   break-after: avoid-column;
   break-before: avoid-column;
   color: #f0f0f0;
+  cursor: default;
   display: block;
   font-size: 1.2em;
   padding-bottom: 0.2em;
@@ -70,7 +71,7 @@ button {
 }
 
 .editing {
-  height: 8em;
+  height: 6em;
   left: calc(50% - 10em);
   padding-top: 1em;
   position: absolute;
