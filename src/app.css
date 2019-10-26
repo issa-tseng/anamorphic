@@ -9,6 +9,9 @@ button {
   font-family: courier;
 }
 
+/************************************************************/
+/** PRIMARY *************************************************/
+
 .screen {
   box-shadow: 0 0 0 2px #000, 0 0 0 3px #444;
   height: calc((100vw - 4em) * 0.5625);
@@ -32,6 +35,9 @@ button {
   width: 100%;
 }
 
+/************************************************************/
+/** CHROME **************************************************/
+
 .slides { padding: 1em 2em; }
 .slides a {
   border-left: 1px solid transparent;
@@ -54,6 +60,9 @@ button {
   font-weight: bold;
 }
 .slides a.active { border-left-color: #aaa; }
+
+/************************************************************/
+/** EDITING *************************************************/
 
 .shot-editor {
   bottom: 0;
@@ -82,6 +91,9 @@ button {
 .editing button { display: none; }
 .is-editing .editing button { display: inline-block; }
 .editing:hover button { display: inline-block; }
+
+/************************************************************/
+/** OTHER ***************************************************/
 
 .init {
   color: #777;
