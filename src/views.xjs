@@ -1,10 +1,13 @@
 const { abs } = Math;
-const { DomView, template, from, Model, bind } = require('janus');
+const { Varying, DomView, template, from, Model, bind, Case } = require('janus');
 const $ = require('jquery');
 const { Projector, Slide, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
-const { deferred, fix, scheduler } = require('./util');
+const { deferred, fix, scheduler, zipLast } = require('./util');
 
+const { above, below } = Case.build('above', 'below');
+const dir = x => above.match(x) ? 'drag-above' : 'drag-below';
+const adj = x => below.match(x) ? 1 : 0;
 
 class ProjectorView extends DomView.build($(`
   <div class="projector">
@@ -24,25 +27,30 @@ class ProjectorView extends DomView.build($(`
       .options({ stringify: (e => e ? 'editing' : 'edit') })
 )) {
   drag(slide) {
-    const projector = this.subject;
-    const slideList = this.artifact().children('.slides');
-    const clear = -> { slideList.find('.drag').removeClass('drag drag-above drag-below'); };
+    const slides = this.subject.get_('film').get_('slides');
+    const container = this.artifact().children('.slides');
 
-    slideList.on('mousemove', 'a', |{ target, originalEvent } -> {
-      clear();
-      const item = $(target);
-      if (item.data('view').subject is slide) return;
-      const dir = (originalEvent.offsetY < (item.outerHeight() / 2)) ? 'above' : 'below';
-      $(event.target).addClass(`drag drag-${dir}`);
+    const target = new Varying();
+    const o_ = zipLast(target).react(false, |[ old, ny ] -> {
+      old?.get().artifact().removeClass(dir(old));
+      ny?.get().artifact().addClass(dir(ny));
+    });
+
+    container.on('mousemove', 'a', event -> {
+      const dom = $(event.target);
+      const view = dom.data('view');
+      target.set(do {
+        if (view.subject is slide) null;
+        if (event.originalEvent.offsetY < (dom.outerHeight() / 2)) above(view);
+        else below(view);
+      });
     });
 
     $(window).one('mouseup', -> {
-      slideList.off('mousemove');
-      guard const hslideView = slideList.find('.drag').data('view');
-      const slides = projector.get_('film').get_('slides');
-      const adj = hslideView.artifact().hasClass('drag-above') ? 0 : 1;
-      slides.move(slide, slides.list.indexOf(hslideView.subject) + adj);
-      clear();
+      container.off('mousemove');
+      const cur = target.get() { slides.move(slide, slides.list.indexOf(cur.get().subject) + adj(cur)); }
+      target.set(null);
+      o_.stop();
     });
   }
 }

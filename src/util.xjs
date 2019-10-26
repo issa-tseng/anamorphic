@@ -1,6 +1,7 @@
 const { Varying } = require('janus');
 const $ = require('jquery');
 const { find } = require('./mutators');
+const { ManagedObservation } = require('janus-stdlib').varying;
 
 const preload = src -> {
   const v = Varying.of(src);
@@ -37,5 +38,14 @@ const scheduler = => {
   };
 };
 
-module.exports = { preload, deferred, fix, scheduler };
+
+const zipLast = v => {
+  return Varying.managed(ManagedObservation.with(v), mo => {
+    const result = new Varying([]);
+    mo.react(y -> result.set([ result._value[1], y ]));
+    return result;
+  });
+};
+
+module.exports = { preload, deferred, fix, scheduler, zipLast };
 
