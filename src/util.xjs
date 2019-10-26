@@ -9,10 +9,13 @@ const preload = src -> {
 };
 
 
+const deferred = f => setTimeout(f, 0);
+
 const fix = (f =>
   (x => f(y => x(x)(y)))
   (x => f(y => x(x)(y)))
 );
+
 
 const scheduler = => {
   let timer;
@@ -34,5 +37,5 @@ const scheduler = => {
   };
 };
 
-module.exports = { preload, fix, scheduler };
+module.exports = { preload, deferred, fix, scheduler };
 

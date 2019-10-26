@@ -3,9 +3,8 @@ const { DomView, template, from, Model, bind } = require('janus');
 const $ = require('jquery');
 const { Projector, Slide, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
-const { fix, scheduler } = require('./util');
+const { deferred, fix, scheduler } = require('./util');
 
-const deferred = f => setTimeout(f, 0);
 
 class ProjectorView extends DomView.build($(`
   <div class="projector">
