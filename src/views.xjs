@@ -7,7 +7,7 @@ const { fix, scheduler } = require('./util');
 
 const deferred = f => setTimeout(f, 0);
 
-const ProjectorView = DomView.build($(`
+class ProjectorView extends DomView.build($(`
   <div class="projector">
     <div class="screen"/>
     <div class="slides"/>
@@ -23,7 +23,30 @@ const ProjectorView = DomView.build($(`
     .render(from.app().attribute('editing'))
       .criteria({ context: 'edit', style: 'button' })
       .options({ stringify: (e => e ? 'editing' : 'edit') })
-));
+)) {
+  drag(slide) {
+    const projector = this.subject;
+    const slideList = this.artifact().children('.slides');
+    const clear = -> { slideList.find('.drag').removeClass('drag drag-above drag-below'); };
+
+    slideList.on('mousemove', 'a', |{ target, originalEvent } -> {
+      clear();
+      const item = $(target);
+      if (item.data('view').subject is slide) return;
+      const dir = (originalEvent.offsetY < (item.outerHeight() / 2)) ? 'above' : 'below';
+      $(event.target).addClass(`drag drag-${dir}`);
+    });
+
+    $(window).one('mouseup', -> {
+      slideList.off('mousemove');
+      guard const hslideView = slideList.find('.drag').data('view');
+      const slides = projector.get_('film').get_('slides');
+      const adj = hslideView.artifact().hasClass('drag-above') ? 0 : 1;
+      slides.move(slide, slides.list.indexOf(hslideView.subject) + adj);
+      clear();
+    });
+  }
+}
 
 const SlideMainView = DomView.build($(`
   <div class="slide">
@@ -130,9 +153,10 @@ const SlideListView = DomView.build(
   find('a')
     .text(from('name'))
     .classed('major', from('major'))
-    .classed('active', from.self().flatMap(.closest(Projector)).map(.subject)
-      .and.subject()
-      .all.flatMap(|projector, slide => projector.get('slide').map(s => s === slide)))
+    .on('mousedown', |event, slide, view -> {
+      event.preventDefault();
+      view.closest_(ProjectorView).drag(slide);
+    })
 );
 
 

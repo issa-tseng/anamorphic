@@ -59,7 +59,10 @@ button {
   color: #fff;
   font-weight: bold;
 }
-.slides a.active { border-left-color: #aaa; }
+.slides a.checked { border-left-color: #aaa; }
+
+.slides a.drag-above { box-shadow: 0 -1px 0 #fff; }
+.slides a.drag-below { box-shadow: 0 1px 0 #fff; }
 
 /************************************************************/
 /** EDITING *************************************************/
