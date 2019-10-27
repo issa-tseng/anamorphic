@@ -1,5 +1,5 @@
 const { abs, round } = Math;
-const { Varying, DomView, template, from, Model, bind, Case } = require('janus');
+const { Varying, DomView, template, from, Model, bind, attribute, Case } = require('janus');
 const $ = require('jquery');
 const { Projector, Slide, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
@@ -65,10 +65,20 @@ const SlideMainView = DomView.build($(`
     .classGroup('count-', from('shots').flatMap(.length))
 ));
 
-const ShotVM = Model.build(
+class ShotVM extends Model.build(
   bind('clip', from.app('film').get('clips')
-    .and.subject('clip').all.flatMap(|cs, k => cs.get(k)))
-);
+    .and.subject('clip').all.flatMap(|cs, k => cs.get(k))),
+  attribute('play', attribute.Boolean)
+) {
+  _initialize() {
+    const shot = this.get_('subject');
+    this.set('play', (?shot.get_('end'))); // TODO: xjs bug
+    this.reactTo(this.get('play'), false, play -> {
+      if (play) { shot.set('end', tap(this.get_('_end')) ?? tap(shot.get_('start'))); }
+      else { this.set('_end', tap(shot.get_('end'))); shot.unset('end'); }
+    });
+  }
+};
 class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
   find('div').video(from.vm('clip').get('src'), false)
 ) {
@@ -119,19 +129,32 @@ class ShotEditor extends DomView.build(ShotVM, $(`
       <button class="set">!&gt;</button>
       <button class="go">&gt;&gt;</button>
     </div>
+    <div class="inputs">
+      <label><span class="input-play"/>play</label>
+      <label><span class="input-loop"/>loop</label>
+      <label><span class="input-mute"/>mute</label>
+    </div>
   </div>
 `), template(
+  find('.shot-editor').classed('has-end', from('end').map(x => ?x)),
+  // video
   find('.shot').video(from.vm('clip').get('src'), true),
+  // delimits
   find('.start').classed('at', from('start').and.vm('at').all.map(|x, y => x is y)),
   find('.start .editor').render(from.attribute('start')),
   find('.end').classed('at', from('end').and.vm('at').all.map(|x, y => x is y)),
   find('.end .editor').render(from.attribute('end')),
-  find('.go').on('click', |event, shot, view ->
+  find('.go') .on('click', |event, shot, view ->
     view.go(shot.get_(($(event.target).text() < '>') ? 'start' : 'end'))),
   find('.set').on('click', |event, shot, view ->
-    shot.set(($(event.target).text() is '<!') ? 'start' : 'end', view.vm.get_('at')))
+    shot.set(($(event.target).text() is '<!') ? 'start' : 'end', view.vm.get_('at'))),
+  // inputs
+  find('.input-play').render(from.vm().attribute('play')).context('edit'),
+  find('.input-loop').render(from.attribute('loop')).context('edit'),
+  find('.input-mute').render(from.attribute('mute')).context('edit')
 )) {
   go(time) {
+    guard time;
     guard const video = this.artifact().find('.shot video')[0];
     const framerate = this.vm.get_('clip').get_('framerate');
     video.currentTime = time / framerate;

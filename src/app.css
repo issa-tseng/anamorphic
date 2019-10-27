@@ -75,12 +75,33 @@ button {
   top: 0;
 }
 .shot-editor .delimit { padding: 1em; position: absolute; }
-.shot-editor .end { right: 0; text-align: right; }
+.shot-editor .end {
+  display: none;
+  right: 0;
+  text-align: right;
+}
+.shot-editor.has-end .end { display: block; }
 .shot-editor .delimit.at button { border-color: #098ce5; }
 .shot-editor button {
   margin: 0 0.1em 0.5em;
   width: 3em;
 }
+
+.shot-editor .inputs {
+  left: 1em;
+  position: absolute;
+  top: 7em;
+}
+.shot-editor .inputs label {
+  color: #fff;
+  background: #000;
+  border: 1px solid #777;
+  display: inline-block;
+  font-family: courier;
+  margin: 0;
+  padding: 0.2em 0.4em;
+}
+.shot-editor .inputs label span { margin-right: 0.3em; }
 
 .editing {
   height: 6em;

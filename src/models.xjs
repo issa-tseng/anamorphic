@@ -11,7 +11,9 @@ class Clips extends List.of(Clip);
 class Frame extends attribute.Number;
 class Shot extends Model.build(
   attribute('start', Frame),
-  attribute('end', Frame)
+  attribute('end', Frame),
+  attribute('loop', attribute.Boolean),
+  attribute('mute', attribute.Boolean)
 );
 class Shots extends List.of(Shot);
 class Slide extends Model.build(
