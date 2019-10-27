@@ -1,4 +1,4 @@
-const { abs } = Math;
+const { abs, round } = Math;
 const { Varying, DomView, template, from, Model, bind, Case } = require('janus');
 const $ = require('jquery');
 const { Projector, Slide, Shot, Frame } = require('./models');
@@ -70,7 +70,7 @@ const ShotVM = Model.build(
     .and.subject('clip').all.flatMap(|cs, k => cs.get(k)))
 );
 class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
-  find('div').video(from.vm('clip').get('src'))
+  find('div').video(from.vm('clip').get('src'), false)
 ) {
   _wireEvents() {
     const shot = this.subject;
@@ -112,32 +112,41 @@ class ShotEditor extends DomView.build(ShotVM, $(`
     <div class="delimit start">
       <div class="editor"/>
       <button class="go">&lt;&lt;</button>
+      <button class="set">&lt;!</button>
     </div>
     <div class="delimit end">
       <div class="editor"/>
+      <button class="set">!&gt;</button>
       <button class="go">&gt;&gt;</button>
     </div>
   </div>
 `), template(
-  find('.shot').video(from.vm('clip').get('src')),
+  find('.shot').video(from.vm('clip').get('src'), true),
   find('.start').classed('at', from('start').and.vm('at').all.map(|x, y => x is y)),
   find('.start .editor').render(from.attribute('start')),
   find('.end').classed('at', from('end').and.vm('at').all.map(|x, y => x is y)),
   find('.end .editor').render(from.attribute('end')),
   find('.go').on('click', |event, shot, view ->
-    view.go(shot.get_(($(event.target).text() < '>') ? 'start' : 'end')))
+    view.go(shot.get_(($(event.target).text() < '>') ? 'start' : 'end'))),
+  find('.set').on('click', |event, shot, view ->
+    shot.set(($(event.target).text() is '<!') ? 'start' : 'end', view.vm.get_('at')))
 )) {
   go(time) {
     guard const video = this.artifact().find('.shot video')[0];
     const framerate = this.vm.get_('clip').get_('framerate');
     video.currentTime = time / framerate;
-    this.vm.set('at', time);
   }
   _wireEvents() {
     deferred(-> {
       const shot = this.subject;
       this.reactTo(shot.get('start'), ::this.go);
       this.reactTo(shot.get('end'), false, ::this.go);
+
+      guard const video = this.artifact().find('.shot video')[0] else throw 'no video??';
+      const framerate = this.vm.get_('clip').get_('framerate');
+      const handler = -> this.vm.set('at', round(video.currentTime * framerate));
+      video.addEventListener('timeupdate', handler); // old school for perf.
+      this.on('destroying', -> video.removeEventListener('timeupdate', handler));
     });
   }
   _destroy() { this.artifact().find('video').trigger('detach'); }
