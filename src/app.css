@@ -21,19 +21,24 @@ button {
   width: calc(100% - 4em);
 }
 
-.shots.count-1 .shot {
+.shots .shot {
   bottom: 0;
   left: 0;
   position: absolute;
   right: 0;
   top: 0;
 }
-.shots.count-1 .shot video {
+
+.shots .shot video {
+  max-height: 100%;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
   width: 100%;
 }
+
+.shots.count-2 .shot:first-child { bottom: 50%; }
+.shots.count-2 .shot:last-child { top: 50%; }
 
 /************************************************************/
 /** CHROME **************************************************/
@@ -87,13 +92,15 @@ button {
 .is-editing .editing button { display: inline-block; }
 .editing:hover button { display: inline-block; }
 
-.slide .input-name {
+/** SLIDE EDITOR **************/
+
+.slide-edit {
   bottom: 1em;
   display: none;
   left: 1em;
   position: absolute;
 }
-.slide .input-name input {
+.slide-edit input {
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.6);
   color: #fff;
@@ -102,9 +109,11 @@ button {
   outline: none;
   padding: 0.5em;
 }
-.is-editing .slide .input-name { display: block; }
+.is-editing .slide-edit { display: block; }
 
-.shot-editor {
+/** SHOT EDITOR ***************/
+
+.shot-editor .video {
   bottom: 0;
   left: 0;
   position: absolute;

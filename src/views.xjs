@@ -61,16 +61,28 @@ class ProjectorView extends DomView.build($(`
   }
 }
 
-const SlideMainView = DomView.build($(`
+const SlideMainVM = Model.build(
+  attribute('clip', class extends attribute.Enum {
+    _values() { return from.app('film').get('clips').map(.keys()); }
+  })
+);
+const SlideMainView = DomView.build(SlideMainVM, $(`
   <div class="slide">
     <div class="shots"/>
-    <div class="input-name"/>
+    <div class="slide-edit">
+      <label class="input-name"/>
+      <label class="clip-selector"/>
+      <button class="add-clip">+</button>
+    </div>
   </div>`), template(
   find('.shots')
     .render(from('shots'))
       .options(from.app('editing').map(e => ({ renderItem: .context(e ? 'edit' : null) })))
     .classGroup('count-', from('shots').flatMap(.length)),
-  find('.input-name').render(from.attribute('name')).context('edit')
+  find('.input-name').render(from.attribute('name')).context('edit'),
+  find('.clip-selector').render(from.vm().attribute('clip')).context('edit'),
+  find('.add-clip').on('click', |_, slide, view ->
+    slide.get_('shots').add(new Shot({ clip: view.vm.get_('clip') })))
 ));
 
 class ShotVM extends Model.build(
@@ -125,8 +137,8 @@ class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
   }
 }
 class ShotEditor extends DomView.build(ShotVM, $(`
-  <div class="shot-editor">
-    <div class="shot"/>
+  <div class="shot shot-editor">
+    <div class="video"/>
     <div class="delimit start">
       <div class="editor"/>
       <button class="go">&lt;&lt;</button>
@@ -146,7 +158,7 @@ class ShotEditor extends DomView.build(ShotVM, $(`
 `), template(
   find('.shot-editor').classed('has-end', from('end').map(x => ?x)),
   // video
-  find('.shot').video(from.vm('clip').get('src'), true),
+  find('.video').video(from.vm('clip').get('src'), true),
   // delimits
   find('.start').classed('at', from('start').and.vm('at').all.map(|x, y => ?x && x is y)),
   find('.start .editor').render(from.attribute('start')),
@@ -163,7 +175,7 @@ class ShotEditor extends DomView.build(ShotVM, $(`
 )) {
   go(time) {
     guard time;
-    guard const video = this.artifact().find('.shot video')[0];
+    guard const video = this.artifact().find('video')[0];
     const framerate = this.vm.get_('clip').get_('framerate');
     video.currentTime = time / framerate;
   }
@@ -173,7 +185,7 @@ class ShotEditor extends DomView.build(ShotVM, $(`
       this.reactTo(shot.get('start'), ::this.go);
       this.reactTo(shot.get('end'), false, ::this.go);
 
-      guard const video = this.artifact().find('.shot video')[0] else throw 'no video??';
+      guard const video = this.artifact().find('video')[0] else throw 'no video??';
       const framerate = this.vm.get_('clip').get_('framerate');
       const handler = -> this.vm.set('at', round(video.currentTime * framerate));
       video.addEventListener('timeupdate', handler); // old school for perf.
