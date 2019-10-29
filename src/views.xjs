@@ -80,8 +80,8 @@ class ShotVM extends Model.build(
     const shot = this.get_('subject');
     this.set('play', (?shot.get_('end'))); // TODO: xjs bug
     this.reactTo(this.get('play'), false, play -> {
-      if (play) { shot.set('end', tap(this.get_('_end')) ?? tap(shot.get_('start'))); }
-      else { this.set('_end', tap(shot.get_('end'))); shot.unset('end'); }
+      if (play) { shot.set('end', this.get_('_end') ?? shot.get_('start')); }
+      else { this.set('_end', shot.get_('end')); shot.unset('end'); }
     });
   }
 };
