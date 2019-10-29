@@ -67,6 +67,13 @@ button {
 /************************************************************/
 /** EDITING *************************************************/
 
+.projector .add-slide {
+  border: none;
+  display: none;
+  margin-left: 2em;
+}
+.projector.is-editing .add-slide { display: inline-block; }
+
 .shot-editor {
   bottom: 0;
   left: 0;

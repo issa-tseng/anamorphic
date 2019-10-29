@@ -1,7 +1,7 @@
 const { abs, round } = Math;
 const { Varying, DomView, template, from, Model, bind, attribute, Case } = require('janus');
 const $ = require('jquery');
-const { Projector, Slide, Shot, Frame } = require('./models');
+const { Projector, Slide, Shots, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
 const { deferred, fix, scheduler, zipLast } = require('./util');
 
@@ -12,8 +12,9 @@ const adj = x => below.match(x) ? 1 : 0;
 class ProjectorView extends DomView.build($(`
   <div class="projector">
     <div class="screen"/>
-    <div class="slides"/>
     <div class="editing"/>
+    <div class="slides"/>
+    <button class="add-slide">+</button>
   </div>`), template(
   find('.projector').classed('is-editing', from.app('editing')),
   find('.screen').render(from('slide')).context('screen'),
@@ -24,7 +25,12 @@ class ProjectorView extends DomView.build($(`
   find('.editing')
     .render(from.app().attribute('editing'))
       .criteria({ context: 'edit', style: 'button' })
-      .options({ stringify: (e => e ? 'editing' : 'edit') })
+      .options({ stringify: (e => e ? 'editing' : 'edit') }),
+  find('.add-slide').on('click', |_, projector -> {
+    const clip = projector.get_('slide').get_('shots').get_(0)?.get_('clip');
+    const slide = new Slide({ name: 'new slide', shots: new Shots([ new Shot({ clip }) ]) });
+    projector.get_('film').get_('slides').add(slide);
+  })
 )) {
   drag(slide) {
     const slides = this.subject.get_('film').get_('slides');
@@ -140,9 +146,9 @@ class ShotEditor extends DomView.build(ShotVM, $(`
   // video
   find('.shot').video(from.vm('clip').get('src'), true),
   // delimits
-  find('.start').classed('at', from('start').and.vm('at').all.map(|x, y => x is y)),
+  find('.start').classed('at', from('start').and.vm('at').all.map(|x, y => ?x && x is y)),
   find('.start .editor').render(from.attribute('start')),
-  find('.end').classed('at', from('end').and.vm('at').all.map(|x, y => x is y)),
+  find('.end').classed('at', from('end').and.vm('at').all.map(|x, y => ?x && x is y)),
   find('.end .editor').render(from.attribute('end')),
   find('.go') .on('click', |event, shot, view ->
     view.go(shot.get_(($(event.target).text() < '>') ? 'start' : 'end'))),
