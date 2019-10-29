@@ -64,11 +64,13 @@ class ProjectorView extends DomView.build($(`
 const SlideMainView = DomView.build($(`
   <div class="slide">
     <div class="shots"/>
+    <div class="input-name"/>
   </div>`), template(
   find('.shots')
     .render(from('shots'))
       .options(from.app('editing').map(e => ({ renderItem: .context(e ? 'edit' : null) })))
-    .classGroup('count-', from('shots').flatMap(.length))
+    .classGroup('count-', from('shots').flatMap(.length)),
+  find('.input-name').render(from.attribute('name')).context('edit')
 ));
 
 class ShotVM extends Model.build(

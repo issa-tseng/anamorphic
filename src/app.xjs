@@ -23,7 +23,8 @@ require('janus-stdlib').view($).registerWith(views);
     $('#anamorphic').empty().append(view.artifact());
     view.wireEvents();
 
-    $(document).on('keyup', ({ which }) -> {
+    $(document).on('keyup', ({ target, which }) -> {
+      if (target.nodeName === 'INPUT') return;
       if (which === 32 || which === 39) projector.nextSlidePlease();
       else if (which === 37) projector.previous();
     });

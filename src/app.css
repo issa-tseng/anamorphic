@@ -74,6 +74,36 @@ button {
 }
 .projector.is-editing .add-slide { display: inline-block; }
 
+.editing {
+  height: 6em;
+  left: calc(50% - 10em);
+  padding-top: 1em;
+  position: absolute;
+  text-align: center;
+  top: 2em;
+  width: 20em;
+}
+.editing button { display: none; }
+.is-editing .editing button { display: inline-block; }
+.editing:hover button { display: inline-block; }
+
+.slide .input-name {
+  bottom: 1em;
+  display: none;
+  left: 1em;
+  position: absolute;
+}
+.slide .input-name input {
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  font-family: courier new;
+  margin: 0;
+  outline: none;
+  padding: 0.5em;
+}
+.is-editing .slide .input-name { display: block; }
+
 .shot-editor {
   bottom: 0;
   left: 0;
@@ -109,19 +139,6 @@ button {
   padding: 0.2em 0.4em;
 }
 .shot-editor .inputs label span { margin-right: 0.3em; }
-
-.editing {
-  height: 6em;
-  left: calc(50% - 10em);
-  padding-top: 1em;
-  position: absolute;
-  text-align: center;
-  top: 2em;
-  width: 20em;
-}
-.editing button { display: none; }
-.is-editing .editing button { display: inline-block; }
-.editing:hover button { display: inline-block; }
 
 /************************************************************/
 /** OTHER ***************************************************/
