@@ -2,12 +2,19 @@ html { font-family: "Helvetica Neue Light"; font-size: 62.5%; }
 body { background-color: #000; color: #fff; }
 html, body, div { margin: 0; padding: 0; }
 
-button {
-  color: #fff;
+button, select, input {
   background: #000;
-  border: 1px solid #777;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
   font-family: courier;
 }
+input[type=checkbox] {
+  -webkit-appearance: none;
+  height: 1em;
+  vertical-align: middle;
+  width: 1em;
+}
+input[type=checkbox]:checked { background: rgba(255, 255, 255, 0.75); }
 
 /************************************************************/
 /** PRIMARY *************************************************/
@@ -107,10 +114,6 @@ button {
 .is-editing .slide-edit { display: block; }
 .slide-edit input,
 .slide-edit select {
-  background: #000;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  color: #fff;
-  font-family: courier new;
   margin: 0;
   outline: none;
   padding: 0.5em;
