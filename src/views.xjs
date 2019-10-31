@@ -71,6 +71,8 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     <div class="shots"/>
     <div class="slide-edit">
       <label class="input-name"/>
+    </div>
+    <div class="slide-edit right">
       <label class="clip-selector"/>
       <button class="add-clip">+</button>
       <button class="export">export</button>

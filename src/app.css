@@ -99,7 +99,10 @@ button {
   display: none;
   left: 1em;
   position: absolute;
-  width: 35em;
+}
+.slide-edit.right {
+  left: auto;
+  right: 0;
 }
 .is-editing .slide-edit { display: block; }
 .slide-edit input,
@@ -117,10 +120,7 @@ button {
   border-radius: 0;
   padding-right: 2em;
 }
-.slide-edit .clip-selector {
-  padding-left: 1em;
-  position: relative;
-}
+.slide-edit .clip-selector { position: relative; }
 .slide-edit .clip-selector::before {
   border: 1px solid #fff;
   border-left: none;
@@ -137,7 +137,7 @@ button {
   padding: 0.5em;
   padding-top: 0.4em;
 }
-.slide-edit .export { margin-left: 1em; }
+.slide-edit .export { margin: 0 1em; }
 
 /** SHOT EDITOR ***************/
 
