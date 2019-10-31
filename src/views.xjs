@@ -73,6 +73,7 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
       <label class="input-name"/>
       <label class="clip-selector"/>
       <button class="add-clip">+</button>
+      <button class="export">export</button>
     </div>
   </div>`), template(
   find('.shots')
@@ -82,7 +83,11 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
   find('.input-name').render(from.attribute('name')).context('edit'),
   find('.clip-selector').render(from.vm().attribute('clip')).context('edit'),
   find('.add-clip').on('click', |_, slide, view ->
-    slide.get_('shots').add(new Shot({ clip: view.vm.get_('clip') })))
+    slide.get_('shots').add(new Shot({ clip: view.vm.get_('clip') }))),
+  find('.export').on('click', |_, _, view -> {
+    const data = view.closest_(Projector).subject.get_('film').serialize();
+    console.log(data); console.log(JSON.stringify(data));
+  })
 ));
 
 class ShotVM extends Model.build(

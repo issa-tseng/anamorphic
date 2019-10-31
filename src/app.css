@@ -101,6 +101,7 @@ button {
   position: absolute;
   width: 35em;
 }
+.is-editing .slide-edit { display: block; }
 .slide-edit input,
 .slide-edit select {
   background: #000;
@@ -132,11 +133,11 @@ button {
   transform: rotate(45deg);
   width: 0.6em;
 }
-.slide-edit .add-clip {
+.slide-edit button {
   padding: 0.5em;
   padding-top: 0.4em;
 }
-.is-editing .slide-edit { display: block; }
+.slide-edit .export { margin-left: 1em; }
 
 /** SHOT EDITOR ***************/
 
