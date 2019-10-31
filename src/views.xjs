@@ -71,6 +71,7 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     <div class="shots"/>
     <div class="slide-edit">
       <label class="input-name"/>
+      <label class="input-major"><span/>major</label>
     </div>
     <div class="slide-edit right">
       <label class="clip-selector"/>
@@ -82,7 +83,10 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     .render(from('shots'))
       .options(from.app('editing').map(e => ({ renderItem: .context(e ? 'edit' : null) })))
     .classGroup('count-', from('shots').flatMap(.length)),
+
   find('.input-name').render(from.attribute('name')).context('edit'),
+  find('.input-major span').render(from.attribute('major')).context('edit'),
+
   find('.clip-selector').render(from.vm().attribute('clip')).context('edit'),
   find('.add-clip').on('click', |_, slide, view ->
     slide.get_('shots').add(new Shot({ clip: view.vm.get_('clip') }))),

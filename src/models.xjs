@@ -18,6 +18,7 @@ class Shot extends Model.build(
 class Shots extends List.of(Shot);
 class Slide extends Model.build(
   attribute('name', attribute.Text),
+  attribute('major', attribute.Boolean),
   attribute('shots', attribute.List.of(Shots))
 );
 class Slides extends List.of(Slide);

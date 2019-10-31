@@ -107,10 +107,6 @@ input[type=checkbox]:checked { background: rgba(255, 255, 255, 0.75); }
   left: 1em;
   position: absolute;
 }
-.slide-edit.right {
-  left: auto;
-  right: 0;
-}
 .is-editing .slide-edit { display: block; }
 .slide-edit input,
 .slide-edit select {
@@ -122,6 +118,23 @@ input[type=checkbox]:checked { background: rgba(255, 255, 255, 0.75); }
   -webkit-appearance: none;
   border-radius: 0;
   padding-right: 2em;
+}
+
+/* left */
+.slide-edit .input-major {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  display: inline-block;
+  font-family: courier;
+  padding: 0.5em;
+}
+.slide-edit .input-major span {
+  margin-right: 0.3em;
+}
+
+/* right */
+.slide-edit.right {
+  left: auto;
+  right: 0;
 }
 .slide-edit .clip-selector { position: relative; }
 .slide-edit .clip-selector::before {
