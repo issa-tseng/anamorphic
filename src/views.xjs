@@ -142,7 +142,7 @@ class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
     const dom = this.artifact();
     const schedule = scheduler();
 
-    deferred(-> {
+    const play = -> {
       guard const video = dom.children('video')[0];
       const start = shot.get_('start');
       const framerate = shotvm.get_('clip').get_('framerate');
@@ -162,6 +162,12 @@ class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
         }))();
       };
       video[?end ? 'play' : 'pause']();
+    };
+
+    deferred(play);
+    this.listenTo($(document), 'keydown', event -> {
+      event.preventDefault();
+      if (event.which is 9) play();
     });
 
     this.on('destroying', -> {
