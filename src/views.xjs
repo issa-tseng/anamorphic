@@ -9,6 +9,9 @@ const { above, below } = Case.build('above', 'below');
 const dir = x => above.match(x) ? 'drag-above' : 'drag-below';
 const adj = x => below.match(x) ? 1 : 0;
 
+////////////////////////////////////////////////////////////////////////////////
+// PROJECTOR VIEW
+
 class ProjectorView extends DomView.build($(`
   <div class="projector">
     <div class="screen"/>
@@ -61,6 +64,23 @@ class ProjectorView extends DomView.build($(`
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// SLIDE LISTITEM
+
+const SlideListView = DomView.build(
+  $('<a/>'),
+  find('a')
+    .text(from('name'))
+    .classed('major', from('major'))
+    .on('mousedown', |event, slide, view -> {
+      event.preventDefault();
+      view.closest_(ProjectorView).drag(slide);
+    })
+);
+
+////////////////////////////////////////////////////////////////////////////////
+// SLIDE VIEW
+
 const SlideMainVM = Model.build(
   attribute('clip', class extends attribute.Enum {
     _values() { return from.app('film').get('clips').map(.keys()); }
@@ -95,6 +115,9 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     console.log(data); console.log(JSON.stringify(data));
   })
 ));
+
+////////////////////////////////////////////////////////////////////////////////
+// SHOT VIEW (split display / edit)
 
 class ShotVM extends Model.build(
   bind('clip', from.app('film').get('clips')
@@ -218,24 +241,13 @@ const FrameEditor = DomView.build($(`
   })
 ));
 
-const SlideListView = DomView.build(
-  $('<a/>'),
-  find('a')
-    .text(from('name'))
-    .classed('major', from('major'))
-    .on('mousedown', |event, slide, view -> {
-      event.preventDefault();
-      view.closest_(ProjectorView).drag(slide);
-    })
-);
-
 
 module.exports = library -> {
   library.register(Projector, ProjectorView);
+  library.register(Slide, SlideListView);
   library.register(Slide, SlideMainView, { context: 'screen' });
   library.register(Shot, ShotView);
   library.register(Shot, ShotEditor, { context: 'edit' });
   library.register(Frame, FrameEditor);
-  library.register(Slide, SlideListView);
 };
 
