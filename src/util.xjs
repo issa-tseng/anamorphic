@@ -10,8 +10,6 @@ const preload = src -> {
 };
 
 
-const deferred = f => setTimeout(f, 0);
-
 const fix = (f =>
   (x => f(y => x(x)(y)))
   (x => f(y => x(x)(y)))
@@ -47,5 +45,5 @@ const zipLast = v => {
   });
 };
 
-module.exports = { preload, deferred, fix, scheduler, zipLast };
+module.exports = { preload, fix, scheduler, zipLast };
 

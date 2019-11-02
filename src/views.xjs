@@ -3,7 +3,7 @@ const { Varying, DomView, template, from, Model, bind, attribute, Case } = requi
 const $ = require('jquery');
 const { Projector, Slide, Shots, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
-const { deferred, fix, scheduler, zipLast } = require('./util');
+const { fix, scheduler, zipLast } = require('./util');
 
 const { above, below } = Case.build('above', 'below');
 const dir = x => above.match(x) ? 'drag-above' : 'drag-below';
@@ -164,7 +164,7 @@ class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
       video[?end ? 'play' : 'pause']();
     };
 
-    deferred(play);
+    play();
     this.listenTo($(document), 'keydown', event -> {
       event.preventDefault();
       if (event.which is 9) play();
@@ -220,17 +220,15 @@ class ShotEditor extends DomView.build(ShotVM, $(`
     video.currentTime = time / framerate;
   }
   _wireEvents() {
-    deferred(-> {
-      const shot = this.subject;
-      this.reactTo(shot.get('start'), ::this.go);
-      this.reactTo(shot.get('end'), false, ::this.go);
+    const shot = this.subject;
+    this.reactTo(shot.get('start'), ::this.go);
+    this.reactTo(shot.get('end'), false, ::this.go);
 
-      guard const video = this.artifact().find('video')[0] else throw 'no video??';
-      const framerate = this.vm.get_('clip').get_('framerate');
-      const handler = -> this.vm.set('at', round(video.currentTime * framerate));
-      video.addEventListener('timeupdate', handler); // old school for perf.
-      this.on('destroying', -> video.removeEventListener('timeupdate', handler));
-    });
+    guard const video = this.artifact().find('video')[0] else throw 'no video??';
+    const framerate = this.vm.get_('clip').get_('framerate');
+    const handler = -> this.vm.set('at', round(video.currentTime * framerate));
+    video.addEventListener('timeupdate', handler); // old school for perf.
+    this.on('destroying', -> video.removeEventListener('timeupdate', handler));
   }
   _destroy() { this.artifact().find('video').trigger('detach'); }
 };
