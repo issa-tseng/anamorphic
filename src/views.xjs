@@ -270,6 +270,7 @@ class TextView extends DomView.build($(`
       <label><span class="input-italic"/>italic</label>
       <label><span class="input-mono"/>mono</label>
       <label><span class="input-invert"/>inv</label>
+      <button class="delete">x</button>
     </div>
   </div>`), template(
   find('.text')
@@ -277,7 +278,8 @@ class TextView extends DomView.build($(`
     .css('top', from('top').map(pct)),
   find('.content').prop('contenteditable', from.app('editing').map(x => x is true)),
   find('.handle').on('mousedown', drag('left', 'top')),
-  toggle('big'), toggle('bold'), toggle('italic'), toggle('mono'), toggle('invert')
+  toggle('big'), toggle('bold'), toggle('italic'), toggle('mono'), toggle('invert'),
+  find('.delete').on('click', |_, text -> text.destroy())
 )) {
   _wireEvents() {
     const dom = this.artifact();
