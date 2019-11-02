@@ -231,6 +231,7 @@ label span { margin-right: 0.3em; }
 }
 
 .text { position: absolute; }
+.text:hover { z-index: 1; }
 .text .handle { right: 100%; top: 0; }
 .text .content {
   cursor: default;
