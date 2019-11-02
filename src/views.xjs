@@ -89,12 +89,12 @@ const SlideMainVM = Model.build(
 const SlideMainView = DomView.build(SlideMainVM, $(`
   <div class="slide">
     <div class="shots"/>
-    <div class="slide-edit">
-      <label class="input-name"/>
+    <div class="edit-chrome slide-edit">
+      <span class="input-name"/>
       <label class="input-major"><span/>major</label>
     </div>
-    <div class="slide-edit right">
-      <label class="clip-selector"/>
+    <div class="edit-chrome slide-edit right">
+      <span class="clip-selector"/>
       <button class="add-clip">+</button>
       <button class="export">export</button>
     </div>

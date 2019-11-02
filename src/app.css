@@ -15,6 +15,24 @@ input[type=checkbox] {
   width: 1em;
 }
 input[type=checkbox]:checked { background: rgba(255, 255, 255, 0.75); }
+label {
+  color: #fff;
+  background: #000;
+  border: 1px solid #777;
+  display: inline-block;
+  font-family: courier;
+  margin: 0;
+  padding: 0.2em 0.4em;
+}
+label span { margin-right: 0.3em; }
+
+/************************************************************/
+/** COMMON *************************************************/
+
+.edit-chrome { display: none; }
+.is-editing .edit-chrome {
+  display: block;
+}
 
 /************************************************************/
 /** PRIMARY *************************************************/
@@ -103,11 +121,9 @@ input[type=checkbox]:checked { background: rgba(255, 255, 255, 0.75); }
 
 .slide-edit {
   bottom: 1em;
-  display: none;
   left: 1em;
   position: absolute;
 }
-.is-editing .slide-edit { display: block; }
 .slide-edit input,
 .slide-edit select {
   margin: 0;
@@ -182,16 +198,6 @@ input[type=checkbox]:checked { background: rgba(255, 255, 255, 0.75); }
   position: absolute;
   top: 7em;
 }
-.shot-editor .inputs label {
-  color: #fff;
-  background: #000;
-  border: 1px solid #777;
-  display: inline-block;
-  font-family: courier;
-  margin: 0;
-  padding: 0.2em 0.4em;
-}
-.shot-editor .inputs label span { margin-right: 0.3em; }
 
 /************************************************************/
 /** OTHER ***************************************************/
