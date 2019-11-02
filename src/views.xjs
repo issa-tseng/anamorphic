@@ -1,8 +1,9 @@
 const { abs, round } = Math;
 const { Varying, DomView, template, from, Model, bind, attribute, Case } = require('janus');
 const $ = require('jquery');
-const { Projector, Slide, Shots, Shot, Frame } = require('./models');
+const { Projector, Text, Slide, Shots, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
+const { drag } = require('./drag');
 const { fix, scheduler, zipLast } = require('./util');
 
 const { above, below } = Case.build('above', 'below');
@@ -89,11 +90,13 @@ const SlideMainVM = Model.build(
 const SlideMainView = DomView.build(SlideMainVM, $(`
   <div class="slide">
     <div class="shots"/>
+    <div class="texts"/>
     <div class="edit-chrome slide-edit">
       <span class="input-name"/>
       <label class="input-major"><span/>major</label>
     </div>
     <div class="edit-chrome slide-edit right">
+      <button class="add-text">+text</button>
       <span class="clip-selector"/>
       <button class="add-clip">+</button>
       <button class="export">export</button>
@@ -104,8 +107,12 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
       .options(from.app('editing').map(e => ({ renderItem: .context(e ? 'edit' : null) })))
     .classGroup('count-', from('shots').flatMap(.length)),
 
+  find('.texts').render(from('texts')),
+
   find('.input-name').render(from.attribute('name')).context('edit'),
   find('.input-major span').render(from.attribute('major')).context('edit'),
+
+  find('.add-text').on('click', |_, slide -> slide.get_('texts').add(new Text())),
 
   find('.clip-selector').render(from.vm().attribute('clip')).context('edit'),
   find('.add-clip').on('click', |_, slide, view ->
@@ -245,6 +252,46 @@ const FrameEditor = DomView.build($(`
   })
 ));
 
+////////////////////////////////////////////////////////////////////////////////
+// ANNOTATIONS
+
+const pct = x => `${x * 100}%`;
+const toggle = prop => template(
+  find('.text').classed(prop, from(prop)),
+  find(`.input-${prop}`).render(from.attribute(prop)).context('edit')
+);
+class TextView extends DomView.build($(`
+  <div class="text">
+    <div class="handle edit-chrome"></div>
+    <div class="content"/>
+    <div class="tools edit-chrome">
+      <label><span class="input-big"/>big</label>
+      <label><span class="input-bold"/>bold</label>
+      <label><span class="input-italic"/>italic</label>
+      <label><span class="input-mono"/>mono</label>
+      <label><span class="input-invert"/>inv</label>
+    </div>
+  </div>`), template(
+  find('.text')
+    .css('left', from('left').map(pct))
+    .css('top', from('top').map(pct)),
+  find('.content').prop('contenteditable', from.app('editing').map(x => x is true)),
+  find('.handle').on('mousedown', drag('left', 'top')),
+  toggle('big'), toggle('bold'), toggle('italic'), toggle('mono'), toggle('invert')
+)) {
+  _wireEvents() {
+    const dom = this.artifact();
+    const text = this.subject;
+
+    // cheating because we can. until we can't someday.
+    const content = dom.find('.content');
+    content.html(text.get_('text'));
+    this.listenTo(content, 'keyup', event -> {
+      event.stopPropagation();
+      text.set('text', content.html());
+    });
+  }
+}
 
 module.exports = library -> {
   library.register(Projector, ProjectorView);
@@ -253,5 +300,6 @@ module.exports = library -> {
   library.register(Shot, ShotView);
   library.register(Shot, ShotEditor, { context: 'edit' });
   library.register(Frame, FrameEditor);
+  library.register(Text, TextView);
 };
 

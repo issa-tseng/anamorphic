@@ -16,10 +16,25 @@ class Shot extends Model.build(
   attribute('mute', attribute.Boolean)
 );
 class Shots extends List.of(Shot);
+
+class Text extends Model.build(
+  initial('text', 'text'),
+  initial('left', 0.5),
+  initial('top', 0.5),
+  attribute('big', attribute.Boolean),
+  attribute('bold', attribute.Boolean),
+  attribute('italic', attribute.Boolean),
+  attribute('mono', attribute.Boolean),
+  attribute('invert', attribute.Boolean)
+);
+class Texts extends List.of(Text);
 class Slide extends Model.build(
   attribute('name', attribute.Text),
   attribute('major', attribute.Boolean),
-  attribute('shots', attribute.List.of(Shots))
+  attribute('shots', attribute.List.of(Shots)),
+  attribute('texts', class extends attribute.List.of(Texts) {
+    initial() { return new Texts(); }
+  })
 );
 class Slides extends List.of(Slide);
 
@@ -62,7 +77,8 @@ class App extends BaseApp.build(
 
 module.exports = {
   Clip, Clips,
-  Frame, Shot, Shots, Slide, Slides,
+  Frame, Shot, Shots,
+  Text, Texts, Slide, Slides,
   Film,
   Projector, App
 };

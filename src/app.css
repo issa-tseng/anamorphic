@@ -54,6 +54,8 @@ label span { margin-right: 0.3em; }
   width: calc(100% - 4em);
 }
 
+.slide { height: 100%; }
+
 .shots .shot {
   bottom: 0;
   left: 0;
@@ -206,6 +208,48 @@ label span { margin-right: 0.3em; }
   position: absolute;
   top: 7em;
 }
+
+/************************************************************/
+/** ANNOTATIONS *********************************************/
+
+.handle {
+  height: 6.4em;
+  position: absolute;
+  width: 1.6em;
+}
+.handle::before {
+  background: rgba(128, 128, 128, 0.4);
+  content: '';
+  display: block;
+  height: 6.4em;
+  transition: 0.4s background;
+  width: 0.5em;
+}
+.handle:hover::before {
+  background: rgba(128, 128, 128, 0.9);
+  transition: none;
+}
+
+.text { position: absolute; }
+.text .handle { right: 100%; top: 0; }
+.text .content {
+  cursor: default;
+  font-size: 2vw;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+.text .tools {
+  margin-top: 0.5em;
+  opacity: 0.3;
+  transition: 0.4s opacity;
+}
+.text .tools:hover { opacity: 1; transition: none; }
+
+.text.big .content { font-size: 4vw; }
+.text.bold .content { font-weight: bold; }
+.text.italic .content { font-style: italic; }
+.text.mono .content { font-family: courier; }
+.text.invert .content { color: rgba(0, 0, 0, 0.8); }
+.is-editing .content { cursor: text; }
 
 /************************************************************/
 /** OTHER ***************************************************/
