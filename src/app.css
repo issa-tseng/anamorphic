@@ -29,8 +29,16 @@ label span { margin-right: 0.3em; }
 /************************************************************/
 /** COMMON *************************************************/
 
+@keyframes fade-in {
+  from { opacity: 0; } to { opacity: 1; }
+}
 .edit-chrome { display: none; }
 .is-editing .edit-chrome {
+  animation-duration: 0.4s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
+  animation-name: fade-in;
+  animation-timing-function: ease-out;
   display: block;
 }
 
