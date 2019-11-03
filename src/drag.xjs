@@ -20,6 +20,7 @@ class Drag extends Model.build(
 }
 
 const drag = |xname, yname => |event, it, view -> {
+  event.preventDefault();
   const operation = new Drag({
     container: view.closest_(Slide).artifact(),
     in: { x: it.get_(xname), y: it.get_(yname) }
