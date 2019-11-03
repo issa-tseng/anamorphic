@@ -241,8 +241,6 @@ label span { margin-right: 0.3em; }
   border: 2px solid rgba(255, 255, 255, 0.6);
   position: absolute;
 }
-.rect.round { border-radius: 9999px; }
-.rect.invert { border-color: rgba(0, 0, 0, 0.8); }
 .rect:hover { z-index: 1; }
 .rect .handle {
   height: 2em;
@@ -273,11 +271,13 @@ label span { margin-right: 0.3em; }
 .rect .handle.ymax { top: 100%; }
 .rect .handle.ymax::before { border-bottom: none; }
 .rect .tools {
-  min-width: 12em;
+  min-width: 14em;
   padding-top: 1em;
   position: absolute;
   top: 100%;
 }
+.rect.round { border-radius: 9999px; }
+.rect.invert { border-color: rgba(0, 0, 0, 0.8); }
 
 /************************************************************/
 /** OTHER ***************************************************/

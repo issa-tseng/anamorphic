@@ -308,12 +308,13 @@ class RectVM extends Model.build(
 );
 class RectView extends DomView.build(RectVM, $(`
   <div class="rect annotation">
-    <div class="handle handle-1 edit-chrome"/>
-    <div class="handle handle-2 edit-chrome"/>
     <div class="tools edit-chrome">
       <label><span class="input-round"/>round</label>
       <label><span class="input-invert"/>inv</label>
+      <button class="delete">x</button>
     </div>
+    <div class="handle handle-1 edit-chrome"/>
+    <div class="handle handle-2 edit-chrome"/>
   </div>`), template(
   find('.rect')
     .css('left', from.vm('x').map(pct))
@@ -330,7 +331,8 @@ class RectView extends DomView.build(RectVM, $(`
     .classGroup('y', from('y2').and('y1').all.map(lcomp))
     .on('mousedown', drag('x2', 'y2')),
 
-  toggle('round'), toggle('invert')
+  toggle('round'), toggle('invert'),
+  find('.delete').on('click', |_, rect -> rect.destroy())
 ));
 
 module.exports = library -> {
