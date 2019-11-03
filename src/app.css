@@ -8,6 +8,7 @@ button, select, input {
   color: #fff;
   font-family: courier;
 }
+button { padding: 0.3em 0.6em 0.4em; }
 input[type=checkbox] {
   -webkit-appearance: none;
   height: 1em;
@@ -165,10 +166,7 @@ label span { margin-right: 0.3em; }
   transform: rotate(45deg);
   width: 0.6em;
 }
-.slide-edit button {
-  padding: 0.5em;
-  padding-top: 0.4em;
-}
+.slide-edit button { padding: 0.5em; }
 .slide-edit .export { margin: 0 1em; }
 
 /** SHOT EDITOR ***************/
