@@ -202,12 +202,19 @@ label span { margin-right: 0.3em; }
 /************************************************************/
 /** ANNOTATIONS *********************************************/
 
-.handle {
+.annotation .tools { opacity: 0.3; transition: 0.4s opacity; }
+.annotation .tools:hover { opacity: 1; transition: none; }
+
+.text { position: absolute; }
+.text:hover { z-index: 1; }
+.text .handle {
   height: 6.4em;
   position: absolute;
+  right: 100%;
+  top: 0;
   width: 1.6em;
 }
-.handle::before {
+.text .handle::before {
   background: rgba(128, 128, 128, 0.4);
   content: '';
   display: block;
@@ -215,32 +222,63 @@ label span { margin-right: 0.3em; }
   transition: 0.4s background;
   width: 0.5em;
 }
-.handle:hover::before {
+.text .handle:hover::before {
   background: rgba(128, 128, 128, 0.9);
   transition: none;
 }
-
-.text { position: absolute; }
-.text:hover { z-index: 1; }
-.text .handle { right: 100%; top: 0; }
 .text .content {
   cursor: default;
   font-size: 2vw;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
-.text .tools {
-  margin-top: 0.5em;
-  opacity: 0.3;
-  transition: 0.4s opacity;
-}
-.text .tools:hover { opacity: 1; transition: none; }
-
+.text .tools { margin-top: 0.5em; }
 .text.big .content { font-size: 4vw; }
 .text.bold .content { font-weight: bold; }
 .text.italic .content { font-style: italic; }
 .text.mono .content { font-family: courier; }
 .text.invert .content { color: rgba(0, 0, 0, 0.8); }
 .is-editing .content { cursor: text; }
+
+.rect {
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  position: absolute;
+}
+.rect.round { border-radius: 9999px; }
+.rect.invert { border-color: rgba(0, 0, 0, 0.8); }
+.rect .handle {
+  height: 2em;
+  position: absolute;
+  width: 2em;
+}
+.rect .handle::before {
+  border: 3px solid rgba(128, 128, 128, 0.4);
+  content: '';
+  display: block;
+  height: 0.6em;
+  left: 0.4em;
+  position: absolute;
+  top: 0.4em;
+  transition: 0.4s border-color;
+  width: 0.6em;
+}
+.rect .handle:hover::before {
+  border-color: rgba(128, 128, 128, 0.9);
+  transition: none;
+}
+.rect .handle.xmin { right: 100%; }
+.rect .handle.xmin::before { border-left: none; }
+.rect .handle.xmax { left: 100%; }
+.rect .handle.xmax::before { border-right: none; }
+.rect .handle.ymin { bottom: 100%; }
+.rect .handle.ymin::before { border-top: none; }
+.rect .handle.ymax { top: 100%; }
+.rect .handle.ymax::before { border-bottom: none; }
+.rect .tools {
+  min-width: 12em;
+  padding-top: 1em;
+  position: absolute;
+  top: 100%;
+}
 
 /************************************************************/
 /** OTHER ***************************************************/

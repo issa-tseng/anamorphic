@@ -1,7 +1,7 @@
-const { abs, round } = Math;
+const { abs, round, min } = Math;
 const { Varying, DomView, template, from, Model, bind, attribute, Case } = require('janus');
 const $ = require('jquery');
-const { Projector, Text, Slide, Shots, Shot, Frame } = require('./models');
+const { Projector, Text, Rect, Slide, Shots, Shot, Frame } = require('./models');
 const { find } = require('./mutators');
 const { drag } = require('./drag');
 const { fix, scheduler, zipLast } = require('./util');
@@ -91,12 +91,14 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
   <div class="slide">
     <div class="shots"/>
     <div class="texts"/>
+    <div class="rects"/>
     <div class="edit-chrome slide-edit">
       <span class="input-name"/>
       <label class="input-major"><span/>major</label>
     </div>
     <div class="edit-chrome slide-edit right">
       <button class="add-text">+text</button>
+      <button class="add-rect">+rect</button>
       <span class="clip-selector"/>
       <button class="add-clip">+</button>
       <button class="export">export</button>
@@ -108,11 +110,13 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     .classGroup('count-', from('shots').flatMap(.length)),
 
   find('.texts').render(from('texts')),
+  find('.rects').render(from('rects')),
 
   find('.input-name').render(from.attribute('name')).context('edit'),
   find('.input-major span').render(from.attribute('major')).context('edit'),
 
   find('.add-text').on('click', |_, slide -> slide.get_('texts').add(new Text())),
+  find('.add-rect').on('click', |_, slide -> slide.get_('rects').add(new Rect())),
 
   find('.clip-selector').render(from.vm().attribute('clip')).context('edit'),
   find('.add-clip').on('click', |_, slide, view ->
@@ -257,11 +261,11 @@ const FrameEditor = DomView.build($(`
 
 const pct = x => `${x * 100}%`;
 const toggle = prop => template(
-  find('.text').classed(prop, from(prop)),
+  find('.annotation').classed(prop, from(prop)),
   find(`.input-${prop}`).render(from.attribute(prop)).context('edit')
 );
 class TextView extends DomView.build($(`
-  <div class="text">
+  <div class="text annotation">
     <div class="handle edit-chrome"></div>
     <div class="content"/>
     <div class="tools edit-chrome">
@@ -295,6 +299,40 @@ class TextView extends DomView.build($(`
   }
 }
 
+const lcomp = |x, y => (x < y) ? 'min' : 'max';
+class RectVM extends Model.build(
+  bind('x', from.subject('x1').and.subject('x2').all.map(min)),
+  bind('width', from.subject('x1').and.subject('x2').all.map(|a, b => abs(a - b))),
+  bind('y', from.subject('y1').and.subject('y2').all.map(min)),
+  bind('height', from.subject('y1').and.subject('y2').all.map(|a, b => abs(a - b)))
+);
+class RectView extends DomView.build(RectVM, $(`
+  <div class="rect annotation">
+    <div class="handle handle-1 edit-chrome"/>
+    <div class="handle handle-2 edit-chrome"/>
+    <div class="tools edit-chrome">
+      <label><span class="input-round"/>round</label>
+      <label><span class="input-invert"/>inv</label>
+    </div>
+  </div>`), template(
+  find('.rect')
+    .css('left', from.vm('x').map(pct))
+    .css('top', from.vm('y').map(pct))
+    .css('width', from.vm('width').map(pct))
+    .css('height', from.vm('height').map(pct)),
+
+  find('.handle-1')
+    .classGroup('x', from('x1').and('x2').all.map(lcomp))
+    .classGroup('y', from('y1').and('y2').all.map(lcomp))
+    .on('mousedown', drag('x1', 'y1')),
+  find('.handle-2')
+    .classGroup('x', from('x2').and('x1').all.map(lcomp))
+    .classGroup('y', from('y2').and('y1').all.map(lcomp))
+    .on('mousedown', drag('x2', 'y2')),
+
+  toggle('round'), toggle('invert')
+));
+
 module.exports = library -> {
   library.register(Projector, ProjectorView);
   library.register(Slide, SlideListView);
@@ -303,5 +341,6 @@ module.exports = library -> {
   library.register(Shot, ShotEditor, { context: 'edit' });
   library.register(Frame, FrameEditor);
   library.register(Text, TextView);
+  library.register(Rect, RectView);
 };
 

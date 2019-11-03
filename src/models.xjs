@@ -28,12 +28,22 @@ class Text extends Model.build(
   attribute('invert', attribute.Boolean)
 );
 class Texts extends List.of(Text);
+class Rect extends Model.build(
+  initial('x1', 0.4), initial('x2', 0.6),
+  initial('y1', 0.4), initial('y2', 0.6),
+  attribute('round', attribute.Boolean),
+  attribute('invert', attribute.Boolean)
+);
+class Rects extends List.of(Rect);
 class Slide extends Model.build(
   attribute('name', attribute.Text),
   attribute('major', attribute.Boolean),
   attribute('shots', attribute.List.of(Shots)),
   attribute('texts', class extends attribute.List.of(Texts) {
     initial() { return new Texts(); }
+  }),
+  attribute('rects', class extends attribute.List.of(Rects) {
+    initial() { return new Rects(); }
   })
 );
 class Slides extends List.of(Slide);
@@ -78,7 +88,7 @@ class App extends BaseApp.build(
 module.exports = {
   Clip, Clips,
   Frame, Shot, Shots,
-  Text, Texts, Slide, Slides,
+  Text, Texts, Rect, Rects, Slide, Slides,
   Film,
   Projector, App
 };
