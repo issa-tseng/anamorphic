@@ -243,6 +243,7 @@ label span { margin-right: 0.3em; }
 }
 .rect.round { border-radius: 9999px; }
 .rect.invert { border-color: rgba(0, 0, 0, 0.8); }
+.rect:hover { z-index: 1; }
 .rect .handle {
   height: 2em;
   position: absolute;
@@ -256,11 +257,11 @@ label span { margin-right: 0.3em; }
   left: 0.4em;
   position: absolute;
   top: 0.4em;
-  transition: 0.4s border-color;
+  transition: 0.4s border;
   width: 0.6em;
 }
 .rect .handle:hover::before {
-  border-color: rgba(128, 128, 128, 0.9);
+  border-color: rgba(128, 128, 128, 0.96);
   transition: none;
 }
 .rect .handle.xmin { right: 100%; }
