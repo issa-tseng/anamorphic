@@ -57,6 +57,7 @@ class Film extends Model.build(
     }
   })
 );
+class Export extends Model;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +91,6 @@ module.exports = {
   Frame, Shot, Shots,
   Text, Texts, Rect, Rects, Slide, Slides,
   Film,
-  Projector, App
+  Projector, App, Export
 };
 

@@ -96,6 +96,28 @@ label span { margin-right: 0.3em; }
 .slides a.drag-below { box-shadow: 0 1px 0 #fff; }
 
 /************************************************************/
+/** EXPORT **************************************************/
+
+.export div {
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  left: calc(50% - 26em);
+  padding: 1em;
+  position: absolute;
+  top: 5em;
+  width: 50em;
+}
+
+.export textarea {
+  background: none;
+  color: #fff;
+  font-family: courier;
+  height: 10em;
+  padding: 0;
+  width: 100%;
+}
+
+/************************************************************/
 /** EDITING *************************************************/
 
 .projector .add-slide {

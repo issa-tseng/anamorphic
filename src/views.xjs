@@ -1,7 +1,7 @@
 const { abs, round, min } = Math;
 const { Varying, DomView, template, from, Model, bind, attribute, Case } = require('janus');
 const $ = require('jquery');
-const { Projector, Text, Rect, Slide, Shots, Shot, Frame } = require('./models');
+const { Projector, Text, Rect, Slide, Shots, Shot, Frame, Export } = require('./models');
 const { find } = require('./mutators');
 const { drag } = require('./drag');
 const { fix, scheduler, zipLast } = require('./util');
@@ -19,6 +19,7 @@ class ProjectorView extends DomView.build($(`
     <div class="editing"/>
     <div class="slides"/>
     <button class="add-slide">+</button>
+    <div class="export"/>
   </div>`), template(
   find('.projector').classed('is-editing', from.app('editing')),
   find('.screen').render(from('slide')).context('screen'),
@@ -34,7 +35,8 @@ class ProjectorView extends DomView.build($(`
     const clip = projector.get_('slide').get_('shots').get_(0)?.get_('clip');
     const slide = new Slide({ name: 'new slide', shots: new Shots([ new Shot({ clip }) ]) });
     projector.get_('film').get_('slides').add(slide);
-  })
+  }),
+  find('.export').render(from('export'))
 )) {
   drag(slide) {
     const slides = this.subject.get_('film').get_('slides');
@@ -123,7 +125,7 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     slide.get_('shots').add(new Shot({ clip: view.vm.get_('clip') }))),
   find('.export').on('click', |_, _, view -> {
     const data = view.closest_(Projector).subject.get_('film').serialize();
-    console.log(data); console.log(JSON.stringify(data));
+    view.closest_(Projector).subject.set('export', new Export({ data }));
   })
 ));
 
@@ -335,6 +337,17 @@ class RectView extends DomView.build(RectVM, $(`
   find('.delete').on('click', |_, rect -> rect.destroy())
 ));
 
+////////////////////////////////////////////////////////////////////////////////
+// EXPORT
+
+class ExportView extends DomView.build(
+  $(`<div><textarea/><button>done</button></div>`),
+  template(
+    find('textarea').text(from('data').map(JSON.stringify)),
+    find('button').on('click', |_, _, view -> view.closest_(Projector).subject.unset('export'))
+));
+
+
 module.exports = library -> {
   library.register(Projector, ProjectorView);
   library.register(Slide, SlideListView);
@@ -344,5 +357,6 @@ module.exports = library -> {
   library.register(Frame, FrameEditor);
   library.register(Text, TextView);
   library.register(Rect, RectView);
+  library.register(Export, ExportView);
 };
 
