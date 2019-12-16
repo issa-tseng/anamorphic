@@ -12,6 +12,7 @@ class Frame extends attribute.Number;
 class Shot extends Model.build(
   attribute('start', Frame),
   attribute('end', Frame),
+  attribute('ends', attribute.Boolean),
   attribute('loop', attribute.Boolean),
   attribute('mute', attribute.Boolean)
 );
