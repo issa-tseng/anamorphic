@@ -166,7 +166,9 @@ class ShotView extends DomView.build(ShotVM, $(`<div class="shot"/>`),
       const end = shot.get_('end') {
         if (shot.get_('ends') === true) {
           fix(set => => schedule(video, start, end, framerate, -> {
-            if (shot.get_('loop') !== true) {
+            if (shot.get_('autoadvance') === true) {
+              this.closest_(Projector).subject.nextSlidePlease();
+            } else if (shot.get_('loop') !== true) {
               video.pause();
               video.currentTime = end / framerate;
             } else {
@@ -207,6 +209,7 @@ class ShotEditor extends DomView.build(ShotVM, $(`
     <div class="inputs">
       <label><span class="input-play"/>play</label>
       <label><span class="input-ends"/>ends</label>
+      <label class="autoadvance"><span class="input-autoadvance"/>autoadvance</label>
       <label><span class="input-loop"/>loop</label>
       <label><span class="input-mute"/>mute</label>
     </div>
@@ -227,6 +230,7 @@ class ShotEditor extends DomView.build(ShotVM, $(`
   // inputs
   find('.input-play').render(from.vm().attribute('play')).context('edit'),
   find('.input-ends').render(from.attribute('ends')).context('edit'),
+  find('.input-autoadvance').render(from.attribute('autoadvance')).context('edit'),
   find('.input-loop').render(from.attribute('loop')).context('edit'),
   find('.input-mute').render(from.attribute('mute')).context('edit')
 )) {

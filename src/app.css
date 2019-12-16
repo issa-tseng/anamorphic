@@ -213,6 +213,9 @@ label span { margin-right: 0.3em; }
   width: 3em;
 }
 
+.shot-editor .autoadvance { display: none; }
+.shot-editor.has-end .autoadvance { display: inline-block; }
+
 .shot-editor .inputs {
   left: 1em;
   position: absolute;
