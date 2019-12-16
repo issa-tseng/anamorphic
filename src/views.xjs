@@ -97,6 +97,7 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
     <div class="edit-chrome slide-edit">
       <span class="input-name"/>
       <label class="input-major"><span/>major</label>
+      <button class="slide-remove">x</button>
     </div>
     <div class="edit-chrome slide-edit right">
       <button class="add-text">+text</button>
@@ -116,6 +117,8 @@ const SlideMainView = DomView.build(SlideMainVM, $(`
 
   find('.input-name').render(from.attribute('name')).context('edit'),
   find('.input-major span').render(from.attribute('major')).context('edit'),
+
+  find('.slide-remove').on('dblclick', |_, slide, view -> slide.destroy()),
 
   find('.add-text').on('click', |_, slide -> slide.get_('texts').add(new Text())),
   find('.add-rect').on('click', |_, slide -> slide.get_('rects').add(new Rect())),
