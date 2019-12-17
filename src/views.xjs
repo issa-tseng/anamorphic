@@ -211,14 +211,16 @@ class ShotEditor extends DomView.build(ShotVM, $(`
     </div>
     <div class="inputs">
       <label><span class="input-play"/>play</label>
-      <label><span class="input-ends"/>ends</label>
-      <label class="autoadvance"><span class="input-autoadvance"/>autoadvance</label>
-      <label><span class="input-loop"/>loop</label>
-      <label><span class="input-mute"/>mute</label>
+      <label class="play-dependent"><span class="input-ends"/>ends</label>
+      <label class="end-dependent"><span class="input-autoadvance"/>autoadvance</label>
+      <label class="end-dependent"><span class="input-loop"/>loop</label>
+      <label class="play-dependent"><span class="input-mute"/>mute</label>
     </div>
   </div>
 `), template(
-  find('.shot-editor').classed('has-end', from('ends')),
+  find('.shot-editor')
+    .classed('plays', from('end').map(e => ?e))
+    .classed('ends', from('ends')),
   // video
   find('.video').video(from.vm('clip').get('src'), true),
   // delimits

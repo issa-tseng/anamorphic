@@ -206,15 +206,17 @@ label span { margin-right: 0.3em; }
   right: 0;
   text-align: right;
 }
-.shot-editor.has-end .end { display: block; }
+.shot-editor.ends .end { display: block; }
 .shot-editor .delimit.at button { border-color: #098ce5; }
 .shot-editor button {
   margin: 0 0.1em 0.5em;
   width: 3em;
 }
 
-.shot-editor .autoadvance { display: none; }
-.shot-editor.has-end .autoadvance { display: inline-block; }
+.shot-editor .play-dependent { display: none; }
+.shot-editor.plays .play-dependent { display: inline-block; }
+.shot-editor .end-dependent { display: none; }
+.shot-editor.ends .end-dependent { display: inline-block; }
 
 .shot-editor .inputs {
   left: 1em;
