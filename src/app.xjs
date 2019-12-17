@@ -31,3 +31,5 @@ require('janus-stdlib').view($).registerWith(views);
   });
 })();
 
+window.onbeforeunload = (=> '');
+
